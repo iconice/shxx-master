@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.common.SeasonDao">
+
+	<!-- 根据学年和学期得到赛季-->
+    <select id="getSeasonsByYearAndTerm" resultType="com.sjht.school.football.resp.common.GetSeasonsByYearAndTermResp">
+        SELECT
+			s.id AS seId,
+			s.se_name AS seName
+		FROM
+			( SELECT s.id FROM base_season s WHERE s.`year` = #{year} AND s.term = #{term} ) AS temp
+			INNER JOIN base_season s ON temp.id = s.parent_id
+    </select>
+</mapper>

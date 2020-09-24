@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.football.student.GradeDao">
+
+    <select id="getgradeList" resultType="com.sjht.school.football.resp.football.student.GradeResp">
+        SELECT
+            g.id AS gradeId,
+            g.grade_name AS gradeName
+        FROM
+            base_grade g
+            ORDER BY g.grade_name DESC
+            LIMIT 6
+    </select>
+
+    <select id="getUserGradeList" resultType="com.sjht.school.football.resp.football.student.GradeResp">
+        SELECT
+            g.id AS gradeId,
+            g.grade_name AS gradeName,
+        CASE
+            WHEN gr.user_id IS NULL THEN
+                0
+            ELSE
+                1
+            END AS isSelect
+        FROM
+            base_grade g
+            LEFT JOIN base_con_grade_user gr ON gr.grade_id = g.id
+            AND gr.user_id = #{userId}
+        ORDER BY g.grade_name DESC
+        LIMIT 6
+    </select>
+
+    <select id="getGradeListByUserId" resultType="com.sjht.school.football.resp.football.student.GradeResp">
+        SELECT
+            g.id AS gradeId,
+            g.grade_name AS gradeName
+        FROM
+            base_grade g
+            INNER JOIN base_con_grade_user gr ON gr.grade_id = g.id
+        where gr.user_id = #{userId}
+        ORDER BY g.grade_name DESC
+        LIMIT 6
+    </select>
+</mapper>

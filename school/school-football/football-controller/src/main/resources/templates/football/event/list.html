@@ -1,0 +1,451 @@
+<!-- 头部 -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 首页</a></li>
+        <li><a href="#">赛事管理</a></li>
+        <li class="active">赛事信息</li>
+    </ol>
+</section>
+<!-- 查询部分 -->
+<section class="content">
+    <div class="jax-box">
+        <form id="formSearch" class="form-horizontal form-search">
+            <div class="form-group">
+                <div class="col-md-3 col-xs-6">
+                    <label class="control-label  col-xs-3" for="teamName">球队名称:</label>
+                    <div class="col-xs-6">
+                        <input type="text" class="form-control" id="teamName">
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-8">
+                    <label class="control-label  col-xs-3">赛事轮次:</label>
+                    <div class="col-xs-8">
+                        <select class="form-control" id="batchNo" name="batchNo" onchange="switchType()">
+                            <option value="0">===请选择===</option>
+                            <option value="1">第一轮</option>
+                            <option value="2">第二轮</option>
+                            <option value="3">第三轮</option>
+                            <option value="4">第四轮</option>
+                            <option value="5">第五轮</option>
+                            <option value="6">第六轮</option>
+                            <option value="7">第七轮</option>
+                            <option value="8">第八轮</option>
+                            <option value="9">第九轮</option>
+                            <option value="10">第十轮</option>
+                            <option value="11">第十一轮</option>
+                            <option value="12">第十二轮</option>
+                            <option value="13">第十三轮</option>
+                            <option value="14">第十四轮</option>
+                            <option value="15">第十五轮</option>
+                            <option value="16">第十六轮</option>
+                            <option value="17">第十七轮</option>
+                            <option value="18">第十八轮</option>
+                            <option value="19">第十九轮</option>
+                            <option value="20">第二十轮</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-8">
+                    <label class="control-label  col-xs-3">类别:</label>
+                    <div class="col-xs-8">
+                        <select class="form-control" id="category" name="category" onchange="switchType()">
+                            <option value="3">课堂联赛</option>
+                            <!--<option value="2">嘉年华</option>-->
+                            <option value="1">天天见</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-8">
+                    <label class="control-label  col-xs-3">赛事类型:</label>
+                    <div class="col-xs-8">
+                        <select class="form-control" id="eventType" name="type" onchange="switchType()">
+                            <option value="">===请选择===</option>
+                            <option value="1">2V2</option>
+                            <option value="2">3V3</option>
+                            <option value="3">5V5</option>
+                            <option value="4">沙滩足球</option>
+                        </select>
+                    </div>
+                </div>
+                <!--<div class="col-md-3 col-xs-8 " style="text-align:left;">-->
+                    <!--<button type="button" id="btn_query" class="btn btn-info">查询</button>-->
+                <!--</div>-->
+            </div>
+        </form>
+    </div>
+    <div class="jax-box jax-box-table">
+        <div id="toolbar" class="btn-group">
+            <button id="manualCreateEvent" type="button" class="btn btn-primary" onclick="manualCreateEvent()">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>手动创建赛事
+            </button>
+            <button id="autoCreateEvent" type="button" class="btn btn-primary" onclick="autoCreateEvent()">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>自动创建赛事
+            </button>
+        </div>
+        <!--  数据列表 -->
+        <table id="table"></table>
+    </div>
+</section>
+
+<!-- 赛事手动创建模态框 -->
+<div id="manualCreateEventModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">手动赛事</h4>
+            </div>
+            <div class="modal-body">
+                <div id="manualCreateEventOpenWindow">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 赛事自动创建模态框 -->
+<div id="autoCreateEventModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">自动赛事</h4>
+            </div>
+            <div class="modal-body">
+                <div id="autoCreateEventOpenWindow">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 赛事创建模态框 -->
+<div id="addScoreModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">计分</h4>
+            </div>
+            <div class="modal-body">
+                <div id="addScoreOpenWindow">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑赛事模态框 -->
+<div id="editeEventModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">编辑</h4>
+            </div>
+            <div class="modal-body">
+                <div id="editeEventModalOpenWindow">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var loadRoleCount = 0;
+    var columns = [
+        {checkbox: true}, {
+            field: 'period',
+            title: '所属届',
+            align: "center"
+        }, {
+            field: 'className',
+            title: '所属班级',
+            align: "center"
+        }, {
+            field: 'PKTeam',
+            title: '赛事',
+            align: "center",
+            formatter: function (value, row, index) {
+                var teams1Name = row.team1Name != null?row.team1Name:"轮空";
+                var teams2Name = row.team2Name != null?row.team2Name:"轮空";
+                return teams1Name + "  PK  " + teams2Name;
+            }
+        }, {
+            field: 'seName',
+            title: '赛季',
+            align: "center",
+            formatter: function (value, row, index) {
+                // return row.year + "学年上学期" + row.seName;
+                if (row.term == 1) {
+                    return row.year + "学年上学期" + row.seName;
+                }
+                if (row.term == 2) {
+                    return row.year + "学年下学期"+ row.seName;
+                }
+            }
+        }, {
+            field: 'siteName',
+            title: '场地名称',
+            align: "center"
+        }, {
+            field: 'category',
+            title: '赛事类别',
+            align: "center",
+            formatter: function (value, row, index) {
+                if (row.category == 1) {
+                    return "天天见";
+                }
+                if (row.category == 2) {
+                    return "嘉年华";
+                }
+                if (row.category == 3) {
+                    return "课堂联赛";
+                }
+            }
+        }, {
+            field: 'type',
+            title: '赛事类型',
+            align: "center",
+            formatter: function (value, row, index) {
+                if (row.type == 1) {
+                    return "2V2";
+                }
+                if (row.type == 2) {
+                    return "3V3";
+                }
+                if (row.type == 3) {
+                    return "5V5";
+                }
+                if (row.type == 3) {
+                    return "沙滩足球";
+                }
+            }
+        }, {
+            field: 'batchNo',
+            title: '轮次',
+            align: "center",
+            formatter: function (value, row, index) {
+                if (row.batchNo == 1) {
+                    return "第一轮";
+                }
+                if (row.batchNo == 2) {
+                    return "第二轮";
+                }
+                if (row.batchNo == 3) {
+                    return "第三轮";
+                }
+                if (row.batchNo == 4) {
+                    return "第四轮";
+                }
+                if (row.batchNo == 5) {
+                    return "第五轮";
+                }
+                if (row.batchNo == 6) {
+                    return "第六轮";
+                }
+                if (row.batchNo == 7) {
+                    return "第七轮";
+                }
+                if (row.batchNo == 8) {
+                    return "第八轮";
+                }
+                if (row.batchNo == 9) {
+                    return "第九轮";
+                }
+                if (row.batchNo == 11) {
+                    return "第十轮";
+                }
+                if (row.batchNo == 12) {
+                    return "第十一轮";
+                }
+                if (row.batchNo == 13) {
+                    return "第十二轮";
+                }
+                if (row.batchNo == 10) {
+                    return "第十三轮";
+                }
+                if (row.batchNo == 14) {
+                    return "第十四轮";
+                }
+                if (row.batchNo == 15) {
+                    return "第十五轮";
+                }
+                if (row.batchNo == 16) {
+                    return "第十六轮";
+                }
+                if (row.batchNo == 17) {
+                    return "第十七轮";
+                }
+                if (row.batchNo == 18) {
+                    return "第十八轮";
+                }
+                if (row.batchNo == 19) {
+                    return "第十九轮";
+                }
+                if (row.batchNo == 20) {
+                    return "第二十轮";
+                }
+            }
+        }, {
+            field: 'PKScore',
+            title: '队伍比分',
+            align: "center",
+            formatter: function (value, row, index) {
+                return row.team1Score + " : " + row.team2Score
+            }
+        }, {
+            field: 'status',
+            title: '状态',
+            align: "center",
+            formatter: function (value, row, index) {
+                if (row.status == 0) {
+                    return "未进行";
+                }
+                if (row.status == 1) {
+                    return "进行中";
+                }
+                if (row.status == 2) {
+                    return "已结束";
+                }
+                if (row.status == 3) {
+                    return "延期";
+                }
+            }
+        }, {
+            field: 'operation',
+            title: '操作',
+            align: "center",
+            formatter: function (value, row, index) {
+                var endEvent = "";
+                var addScore = "";
+                if (row.status == 0) {
+                    endEvent = '<a  class="table-btn table-btn-danger" href="javascript:void(0)" onclick="endEvent(' + row.eventId + ')">结束</a>';
+                    addScore = '<a class="table-btn table-btn-info" href="javascript:void(0)" onclick="addScore(' + row.eventId  +',' + row.category + ')">计分</a>';
+                }
+                var del = '<a  class="table-btn table-btn-danger" href="javascript:void(0)" onclick="deleteEvent(' + row.eventId + ')">删除</a>';
+                var editEvent = '<a class="table-btn table-btn-info" href="javascript:void(0)" onclick="editEvent(' + row.eventId +',' + row.status + ')">编辑</a>';
+                return addScore + del + editEvent;
+            }
+        }];
+    var options = {
+        id: "#table",
+        url: '/event/queryEventPageList',
+        columns: columns,
+        toolbar: '#toolbar',
+        showRefresh: true,
+        queryParams: queryParams
+    }
+
+    // 加载列表
+    Core.initTable(options);
+
+    /*查询用户参数*/
+    function queryParams(params) {
+        var temp = { //这里的键的名字和控制器的变量名必须一致，这边改动，控制器也需要改成一样的
+            limit: params.limit, //页面大小
+            offset: params.offset, //页码
+            eventName: $("#eventName").val(),
+            teamName: $("#teamName").val(),
+            category: $("#category").val(),
+            batchNo: $("#batchNo").val(),
+            type:$("#eventType").val()
+        };
+        return temp;
+    }
+
+    /*计分*/
+    function addScore(eventId, category) {
+        Core.load("#addScoreOpenWindow", "/event/addScorePage?eventId=" + eventId + "category=" + category, function () {
+            $("#addScoreModal").modal("show");
+        }, 2);
+    }
+
+    /*删除*/
+    function deleteEvent(eventId) {
+        Core.confirm("确定删除该赛事？", function () {
+            Core.postAjax("/event/deleteEventByEvenId", {"eventId": eventId}, function (data) {
+                if (data.code == 100000003) {
+                    Core.refreshTable("#table");
+                }
+                layer.msg(data.msg);
+            }, "get")
+        })
+    }
+
+    /*编辑赛事*/
+    function editEvent(eventId, status) {
+        Core.load("#editeEventModalOpenWindow", "/event/editeEventdetail/"+ eventId + "/" + status, function () {
+            $("#editeEventModal").modal("show");
+        }, 2);
+    }
+
+    /*结束赛事*/
+    function endEvent(eventId) {
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/event/endEvent",
+            data: {
+                eventId: eventId
+            },
+            success: function (data) {
+                Core.refreshTable("#table");
+                layer.msg(data.msg);
+            }
+        });
+    }
+
+    function switchType() {
+        Core.refreshTable("#table");
+    }
+
+    function manualCreateEvent() {
+        Core.load("#manualCreateEventOpenWindow", "/event/toManualCreateEventPage", function () {
+            $("#manualCreateEventModal").modal("show");
+        }, 2);
+    }
+
+    function autoCreateEvent() {
+        Core.load("#autoCreateEventOpenWindow", "/event/toAutoCreateEventPage", function () {
+            $("#autoCreateEventModal").modal("show");
+        }, 2);
+    }
+
+    $(function () {
+        /*查询*/
+        $("#btn_query").click(function () {
+            Core.refreshTable("#table");
+        });
+
+        /*新增*/
+        $("#btn_add").click(function () {
+            Core.clearError("#saveSite");
+        });
+
+        $("#teamName").blur(function () {
+            Core.refreshTable("#table");
+        });
+
+        /*保存班级*/
+        $("#saveSite").click(function () {
+            if (doValidForm(siteForm)) {
+                Core.mask("#saveSite");
+                Core.postAjax("/site/AddSite", $("#siteForm").serialize(), function (data) {
+                    Core.unmask("#saveSite");
+                    if (data.code == 100000003) {
+                        Core.refreshTable("#table");
+                        $("#siteModal").modal("hide");
+                        $("#siteForm")[0].reset();
+                    }
+                    layer.msg(data.msg);
+                })
+            }
+            ;
+        });
+    });
+
+</script>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.sys.SysRoleDao">
+
+    <!--查询所有的角色id-->
+    <select id="getRoleIds" resultType="java.lang.String">
+        SELECT
+            r.id
+        FROM
+            sys_role r
+        LEFT JOIN sys_con_user_role ur ON r.id = ur.role_id
+        WHERE ur.user_id = #{userId}
+    </select>
+
+    <!-- 分页查询角色列表 -->
+    <select id="querRolePageList" resultType="com.sjht.school.football.resp.sys.QueryRolePageResp">
+      SELECT
+        r.id AS roleId,
+        r.`name`,
+        r.description,
+        r.create_time AS createTime,
+        r.update_time AS updateTime
+      FROM sys_role r
+        where 1 = 1
+        <if test="params.name != null">
+            AND name LIKE CONCAT('%',#{params.name},'%')
+        </if>
+        ORDER by updateTime
+    </select>
+    <!-- 分页查询角色数量 -->
+    <select id="querRolePageCount" resultType="long">
+      SELECT
+       count(*)
+      FROM sys_role r
+      where 1 = 1
+      <if test="params.name != null">
+          AND name LIKE CONCAT('%',#{params.name},'%')
+      </if>
+    </select>
+</mapper>

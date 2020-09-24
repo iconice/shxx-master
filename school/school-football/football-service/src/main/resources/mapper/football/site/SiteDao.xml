@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.football.site.SiteDao">
+
+    <select id="querySitePageList" resultType="com.sjht.school.football.resp.football.site.SitePageListResp">
+        SELECT
+        s.id AS siteId,
+        s.site_name AS siteName,
+        s.`status`,
+        s.location,
+        s.`status`,
+        s.site_type AS siteType
+        FROM
+        football_base_site s
+        where 1 = 1
+        <if test="params.siteName != null">
+            AND s.site_name LIKE CONCAT('%',#{params.siteName},'%')
+        </if>
+        <if test="params.siteType != null">
+            AND s.site_type = #{params.siteType}
+        </if>
+        <if test="params.location != null">
+            AND s.location LIKE CONCAT('%',#{params.location},'%')
+        </if>
+    </select>
+
+    <select id="querySitePageCount" resultType="long">
+        SELECT
+        count(*)
+        FROM
+        football_base_site s
+        where 1 = 1
+        <if test="params.siteName != null">
+            AND s.site_name LIKE CONCAT('%',#{params.siteName},'%')
+        </if>
+        <if test="params.siteType != null">
+            AND s.site_type = #{params.siteType}
+        </if>
+        <if test="params.location != null">
+            AND s.location LIKE CONCAT('%',#{params.location},'%')
+        </if>
+    </select>
+
+    <update id="updateSiteById">
+        UPDATE `football_base_site`
+        SET
+            `site_name` = #{ew.siteName},
+            `location` = #{ew.location},
+            `site_type` = #{ew.siteType},
+            `update_time` = CURRENT_TIMESTAMP
+        WHERE
+            `id` = #{ew.siteId}
+    </update>
+
+    <select id="getSiteList" resultType="com.sjht.school.football.resp.football.site.SitePageListResp">
+        SELECT
+        s.id AS siteId,
+        s.site_name AS siteName,
+        s.location,
+        s.site_type AS siteType
+        FROM
+        football_base_site s
+        where 1 = 1
+        <if test="siteType != null">
+            AND s.site_type = #{siteType}
+        </if>
+    </select>
+
+    <select id="getSiteIdsByType" resultType="String">
+        SELECT
+            s.id AS siteId
+        FROM
+            football_base_site s
+        WHERE
+            s.site_type = #{type}
+    </select>
+
+</mapper>

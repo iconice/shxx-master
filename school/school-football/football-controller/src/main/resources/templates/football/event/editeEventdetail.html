@@ -1,0 +1,107 @@
+<form class="form-horizontal" id="eventDetailForm">
+    <input hidden="true" id="edite_id" th:value="${entityInfo.id}">
+    <input hidden="true" id="status" th:value="${entityInfo.status}">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">状态 :</label>
+        <div class="col-sm-8" id="statuses">
+
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="edite_siteId">场地:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="edite_siteId">
+                    <option th:selected="${supplier.siteId}==${entityInfo.siteId}" th:each="supplier : ${siteList}"
+                            th:value="${supplier.siteId}"
+                            th:text="${supplier.siteName}">
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="edite_batchNo">批次:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="edite_batchNo" name="batchNo">
+                    <option th:selected="${entityInfo.batchNo} == 1" value="1">第一轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 2" value="2">第二轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 3" value="3">第三轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 4" value="4">第四轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 5" value="5">第五轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 6" value="6">第六轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 7" value="7">第七轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 8" value="8">第八轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 9" value="9">第九轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 10" value="10">第十轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 11" value="11">第十一轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 12" value="12">第十二轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 13" value="13">第十三轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 14" value="14">第十四轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 15" value="15">第十五轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 16" value="16">第十六轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 17" value="17">第十七轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 18" value="18">第十八轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 19" value="19">第十九轮</option>
+                    <option th:selected="${entityInfo.batchNo} == 20" value="20">第二十轮</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="pull-right">
+            <button type="button" id="editeDetailEvent" class="btn btn-info">确定</button>
+            <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+        </div>
+    </div>
+    <!-- /.box-footer -->
+</form>
+<script>
+$(function () {
+    var html = "";
+    var status = $("#status").val();
+    if (status == 0) {
+        html += '<label class="radio-inline pr-5 type"><input type="radio" name="edite_status" value="0" id="type-day" checked="checked"> 未进行</label>';
+        html += '<label class="radio-inline pr-5 type"><input type="radio" name="edite_status" value="2" id="type-classroom"> 已结束</label>';
+    }
+    if (status == 1) {
+        html += '<label class="radio-inline pr-5 type"><input type="radio" name="edite_status" value="0" id="type-day"> 未进行</label>';
+        html += '<label class="radio-inline pr-5 type"><input type="radio" name="edite_status" value="2" id="type-classroom"> 已结束</label>';
+    }
+
+    if (status == 2) {
+        html += '<label class="radio-inline pr-5 type"><input type="radio" name="edite_status" value="0" id="type-day"> 未进行</label>';
+        html += '<label class="radio-inline pr-5 type"><input type="radio" name="edite_status" value="2" id="type-classroom" checked="checked"> 已结束</label>';
+    }
+    $("#statuses").append(html);
+    
+    $("#editeDetailEvent").on("click", function () {
+        var eventId = $("#edite_id").val();
+        var siteId = $("#edite_siteId").val();
+        var batchNo = $("#edite_batchNo").val();
+        var status = $('input:radio[name="edite_status"]:checked').val();
+        $.ajax({
+            type: 'POST',
+            dataType: "json",
+            url: "/event/submitEditeEvent",
+            data: {
+                eventId: eventId,
+                siteId: siteId,
+                batchNo: batchNo,
+                status: status
+            },
+            success: function (datas) {
+                if (datas.code == 100000003) {
+                    $("#editeEventModal").modal("hide");
+                    $("#myModal").modal("hide");
+                    Core.refreshTable("#table",true);
+                }
+                layer.msg(datas.msg);
+            }
+        });
+    });
+});
+</script>

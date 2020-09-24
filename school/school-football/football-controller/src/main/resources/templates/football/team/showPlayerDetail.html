@@ -1,0 +1,89 @@
+<!--查看球员详细信息-->
+<!--先搬过来，在修改-->
+<div id="lookPlayersModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">球员列表</h4>
+            </div>
+            <div class="jax-box jax-box-table">
+                <div id="toolbar2" class="btn-group">
+                    <button id="btn_del" type="button" class="btn btn-danger" data-toggle="modal"
+                            onclick="bathDeletePlayers()">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>一键清空球员
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <table id="lookPlayersTable">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        function lookPlayers(teamId) {
+            lookTeamId = teamId;
+            $("#lookPlayersModal").modal("show");
+            if (lookPlayersCount == 0) {
+                var roleColumns = [
+                    {checkbox: true},
+                    {
+                        field: 'studentId',
+                        title: '学生ID',
+                        align: "center"
+                    }, {
+                        field: 'studentName',
+                        title: '学生姓名',
+                        align: "center"
+                    }, {
+                        field: 'sex',
+                        title: '性别',
+                        align: "center",
+                        formatter: function (value, row, index) {
+                            return row.sex == 0 ? '男' : '女';
+                        }
+                    }, {
+                        field: 'operation',
+                        title: '操作',
+                        align: "center",
+                        formatter: function (value, row, index) {
+                            var del = '<a  class="table-btn table-btn-danger" href="javascript:void(0)" onclick="deletePlayers(' + lookTeamId + ',' + row.studentId + ')">移除</a>';
+                            return del;
+                        }
+                    }];
+                var lookPlayersOptions = {
+                    id: "#lookPlayersTable",
+                    url: "/student/getPlayersList/",
+                    columns: roleColumns,
+                    queryParams: lookPlayersParams,
+                    onLoadSuccess: function () {  //加载成功时执行
+                        lookPlayersCount = 1;
+                    },
+                }
+                Core.initTable(lookPlayersOptions);
+            } else {
+                Core.refreshTable("#lookPlayersTable");
+            }
+        }
+
+        /*删除球队中所有成员*/
+        function bathDeletePlayers() {
+            Core.confirm("确定删除该球队所有成员？", function () {
+                Core.postAjax("/team/deleteAllPlayers", {"teamId": lookTeamId}, function (data) {
+                    if (data.code == 100000003) {
+                        Core.refreshTable("#lookPlayersTable");
+                        Core.refreshTable("#Table");
+                        // $("#lookPlayersModal").modal("show");
+                    }
+                    layer.msg(data.msg);
+                }, "get")
+            })
+        }
+    });
+</script>

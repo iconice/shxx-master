@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.football.team.TeamPlayersDao">
+
+    <!-- 根据队id查询队成员-->
+    <select id="getTeamUserByTeamId" resultType="com.sjht.school.football.resp.football.team.GetTeamUsersResp">
+        SELECT
+            ep.id,
+            s.id AS studentId,
+            s.name AS studentName,
+            t.team_name AS teamName,
+            ep.score,
+            ep.event_id AS eventId
+        FROM
+            football_base_event e
+            INNER JOIN football_con_event_players ep ON e.id = ep.event_id
+            INNER JOIN base_student s ON ep.student_id = s.id
+            INNER JOIN football_base_team t ON ep.team_id = t.id
+            WHERE t.id = #{teamId} AND ep.event_id = #{eventId}
+            <if test="studentName != null and '' != studentName">
+                AND s.name LIKE CONCAT('%',#{studentName},'%')
+            </if>
+    </select>
+
+    <select id="getCarnivalTeamUserByTeamId" resultType="com.sjht.school.football.resp.football.team.GetTeamUsersResp">
+        SELECT
+            ep.id,
+            s.id AS studentId,
+            s.name AS studentName,
+            t.class_name AS teamName,
+            ep.score,
+            ep.event_id AS eventId
+        FROM
+            football_base_event e
+            INNER JOIN football_con_event_players ep ON e.id = ep.event_id
+            INNER JOIN base_student s ON ep.student_id = s.id
+            INNER JOIN base_class t ON ep.team_id = t.id
+            WHERE t.id = #{teamId} AND ep.event_id = #{eventId}
+        <if test="studentName != null and '' != studentName">
+            AND s.name LIKE CONCAT('%',#{studentName},'%')
+        </if>
+    </select>
+
+    <!-- 查询加入球队的人数 -->
+    <select id="getJoinTeamCount" resultType="int">
+        SELECT
+            COUNT( * )
+        FROM
+            football_con_team_players tp
+        WHERE
+            tp.team_id = #{teamId}
+    </select>
+
+    <!-- 得到绑定球队的ids -->
+    <select id="getBingTeamUserIds" resultType="string">
+        SELECT
+            tp.student_id AS studentId
+        FROM
+            football_con_team_players tp
+            INNER JOIN football_base_team t ON tp.team_id = t.id
+        WHERE t.id = #{teamId}
+    </select>
+    <!-- 判断学生是否加入到相同班级的其他队伍-->
+    <select id="getSetudentIsBingOtherClassTeam" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            ( SELECT t.class_id AS classId FROM football_base_team t WHERE t.id = #{teamId}) AS temp
+        INNER JOIN football_base_team t ON temp.classId = t.class_id INNER JOIN football_con_team_players tp ON t.id = tp.team_id
+        WHERE t.id != #{teamId} AND tp.student_id = #{studentId}
+    </select>
+
+    <select id="getPlayersList" resultType="com.sjht.school.football.resp.football.team.GetPlayersListResp">
+        SELECT
+        s.id AS studentId,
+        s.`name` AS studentName,
+        s.sex
+        FROM
+        football_con_team_players tp
+        INNER JOIN base_student s ON tp.student_id = s.id
+        WHERE tp.team_id = #{teamId}
+    </select>
+
+    <select id="getCarnivalPlayersList" resultType="com.sjht.school.football.resp.football.team.GetPlayersListResp">
+        SELECT
+            s.id AS studentId,
+            s.`name` AS studentName,
+            s.sex
+        FROM
+            base_student s
+        WHERE
+            s.class_id = #{teamId}
+    </select>
+
+    <update id="updatePlayersScore">
+        UPDATE `football_con_team_players`
+        SET
+        `score` = score + #{ew.score},
+        `update_time` = CURRENT_TIMESTAMP
+        WHERE
+            team_id = #{ew.teamId} AND student_id = #{ew.studentId}
+    </update>
+
+    <!--判段选择队伍所在班级的学生已经被班级内的其他队伍选择的学生id列表-->
+    <select id="getJoinOtherTeamSIdChoose" resultType="string">
+        SELECT
+            s.id
+        FROM
+            ( SELECT t.class_id FROM football_base_team t WHERE t.id = #{params.teamId} ) AS temp
+            INNER JOIN football_base_team t ON temp.class_id = t.class_id
+            INNER JOIN football_con_team_players tp ON t.id = tp.team_id
+            INNER JOIN base_student s ON tp.student_id = s.id
+        WHERE t.id != #{params.teamId} AND t.team_type = #{params.type}
+
+    </select>
+
+    <select id="getJoinOtherTeamSIdChooseDay" resultType="string">
+        SELECT
+            s.id
+        FROM
+            football_base_team t
+            INNER JOIN football_con_team_players tp ON t.id = tp.team_id
+            INNER JOIN base_student s ON tp.student_id = s.id
+            INNER JOIN base_class c ON s.class_id = c.id
+            INNER JOIN base_grade g ON c.grade_id = g.id
+        WHERE
+            g.id = #{gradeId}
+            AND t.team_type = 1
+            AND t.id != #{teamId}
+    </select>
+
+    <update id="updateTeamPlayersScore">
+        UPDATE `football_con_team_players`
+        SET
+        `score` = score + #{ew.score},
+        `update_time` = CURRENT_TIMESTAMP
+        WHERE
+            student_id = #{ew.studentId} AND team_id = #{ew.teamId}
+    </update>
+
+</mapper>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.football.team.TeamDao">
+
+    <!-- 球队分页查询列表 -->
+    <select id="queryTeamPageList" resultType="com.sjht.school.football.resp.football.team.QueryTeamPageResp">
+        SELECT
+            t.id AS teamId,
+            g.grade_name AS gradeName,
+            c.class_name AS className,
+            t.team_name AS teamName,
+            t.team_type AS teamType,
+            u.name AS creater,
+            g.id AS gradeId,
+            t.count
+        FROM
+        football_base_team t
+        INNER JOIN base_class c ON t.class_id = c.id
+        INNER JOIN base_grade g ON c.grade_id = g.id
+        LEFT JOIN sys_user u ON t.user_id = u.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        where 1 = 1
+        <if test="params.teamName != null">
+            AND t.team_name LIKE CONCAT('%', #{params.teamName},'%')
+        </if>
+        <if test="params.teamType != null">
+            AND t.team_type = #{params.teamType}
+        </if>
+        <if test="params.classId != null">
+            AND t.class_id = #{params.classId}
+        </if>
+        <if test="params.gradeId != null">
+            AND c.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+        ORDER BY t.id DESC
+    </select>
+
+    <select id="queryTeamDayPageList" resultType="com.sjht.school.football.resp.football.team.QueryTeamPageResp">
+        SELECT
+            t.id AS teamId,
+            g.grade_name AS gradeName,
+            t.team_name AS teamName,
+            t.team_type AS teamType,
+            u.name AS creater,
+            g.id AS gradeId,
+            t.count
+        FROM
+            football_base_team t
+        INNER JOIN base_grade g ON t.grade_id = g.id
+        LEFT JOIN sys_user u ON t.user_id = u.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        WHERE 1 = 1 AND t.team_type = '1'
+        <if test="params.teamName != null">
+            AND t.team_name LIKE CONCAT('%', #{params.teamName},'%')
+        </if>
+        <if test="params.teamType != null">
+            AND t.team_type = #{params.teamType}
+        </if>
+        <if test="params.gradeId != null">
+            AND t.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+        ORDER BY t.id DESC
+    </select>
+
+    <!-- 分页查询球队列表数量 -->
+    <select id="queryTeamPageCount" resultType="long">
+        SELECT
+          COUNT(*)
+        FROM
+        football_base_team t
+        INNER JOIN base_class c ON t.class_id = c.id
+        INNER JOIN base_grade g ON c.grade_id = g.id
+        LEFT JOIN sys_user u ON t.user_id = u.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        where 1 = 1
+        <if test="params.teamName != null">
+            AND t.team_name LIKE CONCAT('%', #{params.teamName},'%')
+        </if>
+        <if test="params.teamType != null">
+            AND t.team_type = #{params.teamType}
+        </if>
+        <if test="params.classId != null">
+            AND t.class_id = #{params.classId}
+        </if>
+        <if test="params.gradeId != null">
+            AND c.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+    </select>
+
+    <select id="queryTeamDayPageCount" resultType="long">
+        SELECT
+        COUNT(*)
+        FROM
+            football_base_team t
+        INNER JOIN base_grade g ON t.grade_id = g.id
+        LEFT JOIN sys_user u ON t.user_id = u.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        WHERE 1 = 1 AND t.team_type = '1'
+        <if test="params.teamName != null">
+            AND t.team_name LIKE CONCAT('%', #{params.teamName},'%')
+        </if>
+        <if test="params.teamType != null">
+            AND t.team_type = #{params.teamType}
+        </if>
+        <if test="params.gradeId != null">
+            AND t.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+    </select>
+
+    <!--课堂联赛列表-->
+    <select id="getClassroomTeamList" resultType="com.sjht.school.football.resp.football.team.TeamListResp">
+        SELECT
+            t.id AS teamId,
+            t.team_name AS teamName,
+            t.class_id AS classId,
+            t.grade_id AS gradeId
+        FROM
+            football_base_team t
+        WHERE 1 = 1
+        <if test="params.category == 3">
+            AND t.class_id = #{params.classId} AND t.team_type = 3
+        </if>
+        <if test="params.team1Id != null and params.team1Id != ''">
+            AND t.id != #{params.team1Id}
+        </if>
+    </select>
+
+    <!--嘉年华赛列表-->
+    <select id="getCarnivalTeamList" resultType="com.sjht.school.football.resp.football.team.TeamListResp">
+        SELECT
+        c.id AS teamId,
+        c.class_name AS teamName,
+        c.id AS classId,
+        c.grade_id AS gradeId
+        FROM
+        base_class c
+        WHERE c.grade_id = #{params.gradeId}
+    </select>
+
+    <!--天天乐赛列表-->
+    <select id="getDayeamList" resultType="com.sjht.school.football.resp.football.team.TeamListResp">
+        SELECT
+            t.id AS teamId,
+            t.team_name AS teamName,
+            t.class_id AS classId,
+            t.grade_id AS gradeId
+        FROM
+            football_base_team t
+            INNER JOIN base_grade g ON t.grade_id = g.id
+        WHERE 1 = 1
+            AND t.team_type = '1' AND t.grade_id = #{params.gradeId}
+        <if test="params.team1Id != null and params.team1Id != ''">
+            AND t.id != #{params.team1Id}
+        </if>
+    </select>
+
+    <!-- 通过球队Id更新-->
+    <update id="updateByTeamId" >
+        UPDATE `football_base_team`
+        SET `user_id` = #{ew.userId},
+            `team_name` = #{ew.teamName},
+            `count` = #{ew.count},
+            `team_type` = #{ew.teamTypr},
+            `update_time` = CURRENT_TIMESTAMP
+        WHERE
+            `id` = #{ew.id}
+    </update>
+
+    <!--查询所有的球队id-->
+    <select id="getStudentIds" resultType="java.lang.String">
+
+    </select>
+    <!-- 根据球队ID和学生ID删除球员 -->
+    <update id="deletePlayers" >
+        DELETE FROM football_con_team_players WHERE team_id =#{dp.teamId} AND student_id =#{dp.studentId}
+    </update>
+
+    <update id="deleteAllPlayers" >
+        DELETE FROM football_con_team_players WHERE team_id =#{dp.teamId}
+    </update>
+
+    <!--查询该队伍在本班级内的其他队伍已经组建了赛事的队伍id-->
+    <select id="getEventTeamIdByTeamId" resultType="String">
+        SELECT
+            temp.teamId
+        FROM
+            ( SELECT t.id AS teamId FROM football_base_team t
+                  WHERE t.id != #{params.team1Id}
+                  <if test="params.period == 1">
+                    AND  t.period = #{params.period}
+                 </if>
+                  <if test="params.period == 2">
+                      AND  t.period = #{params.period}
+                  </if>
+                  <if test="params.period == 3">
+                      AND t.class_id = #{params.classId}
+                  </if>
+            ) AS temp
+            INNER JOIN football_base_event e ON temp.teamId = e.team2_id
+        WHERE
+            e.team1_id = #{params.team1Id}
+            AND type = #{params.type}
+            AND e.status in(0, 1)
+        UNION
+        SELECT
+            temp.teamId
+        FROM
+        ( SELECT t.id AS teamId FROM football_base_team t
+                WHERE t.id != #{params.team1Id}
+                <if test="params.period == 1">
+                    AND  t.period = #{params.period}
+                </if>
+                <if test="params.period == 2">
+                    AND  t.period = #{params.period}
+                </if>
+                <if test="params.period == 3">
+                    AND t.class_id = #{params.classId}
+                </if>
+            ) AS temp
+            INNER JOIN football_base_event e ON temp.teamId = e.team1_id
+        WHERE
+            e.team2_id = #{params.team1Id}
+            AND type = #{params.type}
+            AND e.status in(0, 1)
+    </select>
+
+    <!-- 为赢的球队添加3分 -->
+    <update id="win" >
+        UPDATE football_base_team set score = score+3 where id= #{teamId}
+    </update>
+
+    <!-- 为平的球队添加1分 -->
+    <update id="flat" >
+        UPDATE football_base_team set score = score+1 where id= #{teamId}
+    </update>
+
+</mapper>

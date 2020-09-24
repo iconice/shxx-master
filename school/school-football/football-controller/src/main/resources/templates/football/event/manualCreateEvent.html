@@ -1,0 +1,272 @@
+<form class="form-horizontal" id="eventDetailForm">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">栏目 :</label>
+        <div class="col-sm-8">
+            <label class="radio-inline pr-5 type"><input type="radio" name="manual_category" value="1" id="type-day">
+                天天见</label>
+            <label class="radio-inline pr-5 type"><input type="radio" name="manual_category" value="3"
+                                                         id="type-classroom" checked="checked"> 课堂联赛</label>
+        </div>
+    </div>
+    <div class="form-group classes gradeId">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="manual_gradeId">届 :</label>
+            <div class="col-xs-5">
+                <select name="auto_gradeId" class="form-control" id="manual_gradeId" onchange="switchPeriodManual()">
+                    <option value=''>==请选择届==</option>
+                    <option th:each="supplier : ${grades}" th:value="${supplier.gradeId}"
+                            th:text="${supplier.gradeName}">
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group classes">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="manual_classId">班级 :</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="manual_classId" onchange="switchClassManual()">
+
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="team1Id">球队1 :</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="team1Id" onchange="switchTeam()">
+
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="team1Id">球队2 :</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="team2Id" onchange="switchTeam()">
+
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="manual_seasonId">赛季:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="manual_seasonId">
+                    <option th:each="supplier : ${seasons}" th:value="${supplier.seId}"
+                            th:text="${supplier.seName}">
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="manual_batchNo">赛事轮次:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="manual_batchNo">
+                    <option value="0">===请选择===</option>
+                    <option value="1">第一轮</option>
+                    <option value="2">第二轮</option>
+                    <option value="3">第三轮</option>
+                    <option value="4">第四轮</option>
+                    <option value="5">第五轮</option>
+                    <option value="6">第六轮</option>
+                    <option value="7">第七轮</option>
+                    <option value="8">第八轮</option>
+                    <option value="9">第九轮</option>
+                    <option value="4">第十轮</option>
+                    <option value="5">第十一轮</option>
+                    <option value="6">第十二轮</option>
+                    <option value="7">第十三轮</option>
+                    <option value="8">第十四轮</option>
+                    <option value="9">第十五轮</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="manual_type">赛事类型:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="manual_type">
+                    <option value="1">2V2</option>
+                    <option value="2">3V3</option>
+                    <option value="3">5V5</option>
+                    <option value="4">沙滩足球</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="manual_siteId">场地:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="manual_siteId">
+                    <option th:each="supplier : ${siteList}" th:value="${supplier.siteId}"
+                            th:text="${supplier.siteName}">
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="pull-right">
+            <button type="button" id="createEvent" class="btn btn-info">确定</button>
+            <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+        </div>
+    </div>
+    <!-- /.box-footer -->
+</form>
+<script>
+    var team2IsStr; // 队伍2的字符串
+    $(function () {
+        /*创建赛事*/
+        $("#createEvent").click(function () {
+            Core.mask("#createEvent");
+            var category = $('input:radio[name="manual_category"]:checked').val();
+            var team1Id = $("#team1Id").val();
+            var team2Id = $("#team1Id").val();
+            var gradeId = $("#manual_gradeId").val();
+            var batchNo = $("#manual_batchNo").val();
+            var classId = $("#manual_classId").val();
+            var siteId = $("#manual_siteId").val();
+            var seasonId = $("#manual_seasonId").val();
+            var type = $("#manual_type").val();
+            Core.postAjax('/event/createEvent', {
+                category: category,
+                team1Id: team1Id,
+                team2Id: team2Id,
+                gradeId: gradeId,
+                classId: classId,
+                siteId: siteId,
+                seasonId: seasonId,
+                batchNo: batchNo,
+                type: type
+            }, function (data) {
+                Core.unmask("#createEvent");
+                if (data.code == 100000003) {
+                    $("#manualCreateEventModal").modal("hide");
+                    $("#myModal").modal("hide");
+                    Core.refreshTable("#table",true);
+                }
+                layer.msg(data.msg);
+            })
+        });
+
+
+        $('input:radio[name="manual_category"]').click(function () {
+            var eventType = $('input:radio[name="manual_category"]:checked').val();
+            if (eventType == 1) {
+                getTeam1();
+                $(".classes").hide();
+                $(".gradeId").show();
+            } else if (eventType == 2) {
+
+            } else if (eventType == 3) {
+                getTeam1();
+                getClassList();
+                $(".classes").show();
+            }
+        });
+    });
+
+    /*查询球队1*/
+    function getTeam1() {
+        var category = $('input:radio[name="manual_category"]:checked').val();
+        var gradeId = $("#manual_gradeId").val();
+        var classId = $("#manual_classId").val();
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getTeamListByClassIdORGrade",
+            data: {
+                classId: classId, gradeId: gradeId, category: category
+            },
+            success: function (datas) {
+                var teamsOptions;
+                document.getElementById("team1Id").options.length = 0;
+                document.getElementById("team2Id").options.length = 0;
+                var teamsOptions1 = "<option value=''>==选择球队1==</option>";
+                var teamsOptions2 = "<option value=''>==选择球队2==</option>";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions1 += "<option value='" + d.teamId + "'>" + d.teamName + "</option>";
+                    teamsOptions2 += "<option value='" + d.teamId + "'>" + d.teamName + "</option>";
+                }
+                $("#team1Id").append(teamsOptions1);
+                $("#team2Id").append(teamsOptions2);
+            }
+        });
+    }
+
+    /*查询班级*/
+    function getClassList() {
+        var gradeId = $("#gradeId").val();
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getClassList",
+            data: {
+                gradeId: gradeId
+            },
+            success: function (datas) {
+                var teamsOptions;
+                document.getElementById("classId").options.length = 0;
+                var teamsOptions = "";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions += "<option value='" + d.classId + "'>" + d.className + "</option>";
+                }
+                $("#classId").append(teamsOptions);
+            }
+        });
+    }
+
+    /*切换班级*/
+    function switchClassManual() {
+        getTeam1();
+    }
+
+    /*切换届*/
+    function switchPeriodManual() {
+        var category = $('input:radio[name="manual_category"]:checked').val();
+        if (category == 3) {
+            getClassList();
+        } else {
+            getTeam1();
+        }
+    }
+
+    /*切换班级*/
+    function switchTeam() {
+        Core.refreshTable("#team2Table");
+    }
+
+    /*查询班级*/
+    function getClassList() {
+        var gradeId = $("#manual_gradeId").val();
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getClassList",
+            data: {
+                gradeId: gradeId
+            },
+            success: function (datas) {
+                document.getElementById("manual_classId").options.length = 0;
+                var teamsOptions = "<option value=''>==选择班级==</option>";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions += "<option value='" + d.classId + "'>" + d.className + "</option>";
+                }
+                $("#manual_classId").append(teamsOptions);
+            }
+        });
+    }
+
+</script>

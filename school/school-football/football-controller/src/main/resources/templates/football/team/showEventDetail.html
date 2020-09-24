@@ -1,0 +1,51 @@
+<form class="form-horizontal" id="siteDetailForm">
+    <input class="hidden" id="siteId" name="siteId" th:value="teamId">
+    <div class="modal-body">
+        <table id="eventListTable">
+        </table>
+    </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="pull-right">
+            <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+        </div>
+    </div>
+    <!-- /.box-footer -->
+</form>
+<script>
+    var playersColumns = [
+         {
+            field: 'studentId',
+            title: '学生ID',
+            align: "center"
+        }, {
+            field: 'studentName',
+            title: '学生姓名',
+            align: "center"
+        }, {
+            field: 'sex',
+            title: '性别',
+            align: "center",
+            formatter: function (value, row, index) {
+                return row.sex == 0 ? '男' : '女';
+            }
+        }, {
+            field: 'className',
+            title: '所在班级',
+            align: "center"
+        }];
+    var roleOptions = {
+        id: "#eventListTable",
+        url: "/student/getStudentList",
+        columns: playersColumns,
+        queryParams: queryPlayersParams
+    }
+    Core.initTable(roleOptions);
+
+    function queryPlayersParams(params) {
+        var temp = {
+            teamId: $("#teamId").val()
+        };
+        return temp;
+    }
+</script>

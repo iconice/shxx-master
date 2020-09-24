@@ -1,0 +1,214 @@
+<form class="form-horizontal" id="eventScoreForm">
+    <input id = "eventId" name="eventId" th:value="${eventInfo.id}" hidden=true />
+    <input id = "category" name="category" th:value="${category}" hidden=true />
+    <div class="box-body">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">姓名 :</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" name="addScorestudentNname" id="addScorestudentNname" placeholder="输入姓名搜索">
+            </div>
+        </div>
+    </div>
+    <section class="content">
+        <div class="jax-box jax-box-table">
+            <input id = "team1Id" name="team1Id" th:value="${eventInfo.team1Id}" hidden=true />
+            <div id="toolbar1" class="btn-group">
+                <button id="btn_add1" type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentModal">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>球队1成员
+                </button>
+            </div>
+            <!--  数据列表 -->
+            <table id="table1"></table>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="jax-box jax-box-table">
+            <input id = "team2Id" name="team2Id" th:value="${eventInfo.team2Id}" hidden=true />
+            <div id="toolbar2" class="btn-group">
+                <button id="btn_add2" type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentModal">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>球队2成员
+                </button>
+            </div>
+            <!--  数据列表 -->
+            <table id="table2"></table>
+        </div>
+    </section>
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="pull-right">
+            <!--<button type="button" id="saveEventScore" class="btn btn-info">确定</button>-->
+            <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+        </div>
+    </div>
+    <!-- /.box-footer -->
+</form>
+
+<script>
+    $(function () {
+        $("#saveEventScore").on('click', function () {
+            if (doValidForm(eventScoreForm)) {
+                Core.mask("#saveEventScore");
+                Core.postAjax("/event/updateScore",$("#eventScoreForm").serialize(),function (data) {
+                    if (data.code == 100000003) {
+                        Core.unmask("#saveEventScore");
+                        $("#addScoreModal").modal("hide");
+                        $("#myModal").modal("hide");
+                        Core.refreshTable("#table",true);
+                    }
+                    layer.msg(data.msg);
+                })
+            }
+        });
+
+        $("#addScorestudentNname").blur(function () {
+            Core.refreshTable("#table1",true);
+            Core.refreshTable("#table2",true);
+        });
+    });
+
+    function add(userId, id, team) {
+        var eventId = $("#eventId").val();
+        var teamId = "";
+        if (team == 1) {
+            teamId = $("#team1Id").val();
+        } else if (team == 2) {
+            teamId = $("#team2Id").val();
+        }
+        $.ajax({
+            type:'POST',
+            dataType: "json",
+            url:"/eventPlayers/updatePlayersScore",
+            data:{
+                studentId:userId,
+                id:id,
+                operation: "+",
+                eventId: eventId,
+                team: team,
+                teamId: teamId
+            },
+            success:function(data){
+                Core.refreshTable("#table1",true);
+                Core.refreshTable("#table2",true);
+                layer.msg(data.msg);
+            }
+        });
+    }
+
+    function subtract(userId, id, team) {
+        var eventId = $("#eventId").val();
+        var teamId = "";
+        if (team == 1) {
+            teamId = $("#team1Id").val();
+        } else if (team == 2) {
+            teamId = $("#team2Id").val();
+        }
+        $.ajax({
+            type:'POST',
+            dataType: "json",
+            url:"/eventPlayers/updatePlayersScore",
+            data:{
+                studentId:userId,
+                id:id,
+                operation: "-",
+                eventId: eventId,
+                team: team,
+                teamId: teamId
+            },
+            success:function(data){
+                Core.refreshTable("#table1",true);
+                Core.refreshTable("#table2",true);
+                layer.msg(data.msg);
+            }
+        });
+    }
+
+    var team1Columns = [
+        {
+            field: 'teamName',
+            title: '球队名称',
+            align : "center"
+        },{
+            field: 'studentName',
+            title: '队员名字',
+            align : "center"
+        },{
+            field: 'score',
+            title: '进球数',
+            align : "center"
+        },
+        {
+            field : 'operation',
+            title : '操作',
+            align : "center",
+            formatter : function(value,row, index) {
+                var add = '<a class="table-btn table-btn-info" href="javascript:void(0)" onclick="add(' + row.studentId + ',' + row.id + ',' + 1 + ')">加球</a>';
+                var subtract = '<a class="table-btn table-btn-info"  href="javascript:void(0)" onclick="subtract(' + row.studentId + ',' + row.id + ',' + 1 + ')">减球</a>';
+                return add + subtract;
+            }
+        }];
+
+    var team2Columns = [
+        {
+            field: 'teamName',
+            title: '球队名称',
+            align : "center"
+        },{
+            field: 'studentName',
+            title: '队员名字',
+            align : "center"
+        },{
+            field: 'score',
+            title: '进球数',
+            align : "center"
+        },
+        {
+            field : 'operation',
+            title : '操作',
+            align : "center",
+            formatter : function(value,row, index) {
+                var add = '<a class="table-btn table-btn-info" href="javascript:void(0)" onclick="add(' + row.studentId + ',' + row.id + ',' + 2 + ')">加球</a>';
+                var subtract = '<a class="table-btn table-btn-info"  href="javascript:void(0)" onclick="subtract(' + row.studentId + ',' + row.id + ',' + 2 + ')">减球</a>';
+                return add + subtract;
+            }
+        }];
+    /*球队1信息开始*/
+    // 查询参数
+    function queryTeam1Params(params) {
+        var temp = {
+            teamId : $("#team1Id").val(),
+            category: $("#category").val(),
+            eventId: $("#eventId").val(),
+            studentName: $("#addScorestudentNname").val()
+        };
+        return temp;
+    }
+    var team1Options={
+        id:"#table1",
+        url: '/event/getTeamUserByTeamId',
+        columns:team1Columns,
+        queryParams : queryTeam1Params
+    }
+    Core.initTable(team1Options);
+    /*球队1信息结束*/
+
+    /*球队2信息开始*/
+    function team2QueryParams(params) {
+        var temp = {
+            teamId : $("#team2Id").val(),
+            category: $("#category").val(),
+            eventId: $("#eventId").val(),
+            studentName: $("#addScorestudentNname").val()
+        };
+        return temp;
+    }
+    var team2Options={
+        id:"#table2",
+        url: '/event/getTeamUserByTeamId',
+        columns:team2Columns,
+        // pagination : false,
+        queryParams : team2QueryParams
+    }
+    Core.initTable(team2Options);
+    /*球队2信息结束*/
+</script>

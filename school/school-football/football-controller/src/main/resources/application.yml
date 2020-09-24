@@ -1,0 +1,20 @@
+# Tomcat
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 1003
+    min-spare-threads: 30
+  port: 7001
+  connection-timeout: 5000ms
+  servlet:
+    context-path: /
+  compression:
+       enabled: true
+spring:
+  # 环境 dev|test|pre|prod
+  profiles:
+    active: test
+# 加载日志配置文件
+logging:
+  config: classpath:logback-fg.xml
+

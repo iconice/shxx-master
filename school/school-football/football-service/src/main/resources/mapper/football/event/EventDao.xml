@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.football.event.EventDao">
+
+    <!-- 课堂赛事分页查询列表 -->
+    <select id="queryClassroomEventPageList" resultType="com.sjht.school.football.resp.football.event.QueryEventPageListResp">
+        SELECT
+        e.id AS eventId,
+        e.event_name AS eventName,
+        s.site_name AS siteName,
+        t1.team_name AS team1Name,
+        t2.team_name AS team2Name,
+        e.team1_score AS team1Score,
+        e.team2_score AS team2Score,
+        e.start_time AS startTime,
+        e.end_time AS endTime,
+        g.grade_name AS period,
+        c.class_name AS className,
+        e.batch_no AS batchNo,
+        e.category,
+        e.type,
+        e.STATUS,
+        se.se_name AS seName,
+        se2.term,
+        se2.`year`
+        FROM
+        football_base_event e
+        INNER JOIN football_base_site s ON e.site_id = s.id
+        LEFT JOIN football_base_team t1 ON e.team1_id = t1.id
+        LEFT JOIN football_base_team t2 ON e.team2_id = t2.id
+        INNER JOIN base_class c ON e.class_id = c.id
+        INNER JOIN base_grade g ON e.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        INNER JOIN base_season se ON e.season_id = se.id
+        INNER JOIN base_season se2 ON se.parent_id = se2.id
+        where 1 = 1
+        <if test="params.teamName != null">
+            AND (t1.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            OR
+            t2.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            )
+        </if>
+        <if test="params.category != null">
+            AND e.category = #{params.category}
+        </if>
+        <if test="params.batchNO != null">
+            AND e.batch_no = #{params.batchNO}
+        </if>
+        <if test="params.type != null">
+            AND e.type = #{params.type}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+        ORDER BY e.update_time DESC, e.batch_no
+    </select>
+
+    <!-- 嘉年华赛事分页查询列表 -->
+    <select id="queryCarnivalEventPageList" resultType="com.sjht.school.football.resp.football.event.QueryEventPageListResp">
+        SELECT
+        e.id AS eventId,
+        e.event_name AS eventName,
+        s.site_name AS siteName,
+        t1.class_name AS team1Name,
+        t2.class_name AS team2Name,
+        e.team1_score AS team1Score,
+        e.team2_score AS team2Score,
+        e.start_time AS startTime,
+        e.end_time AS endTime,
+        g.grade_name AS period,
+        e.batch_no AS batchNo,
+        e.category,
+        e.type,
+        e.STATUS,
+        se.se_name AS seName
+        FROM
+        football_base_event e
+        INNER JOIN football_base_site s ON e.site_id = s.id
+        LEFT JOIN base_class t1 ON e.team1_id = t1.id
+        LEFT JOIN base_class t2 ON e.team2_id = t2.id
+        INNER JOIN base_grade g ON e.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        INNER JOIN base_season se ON e.season_id = se.id
+        INNER JOIN base_season se2 ON se.parent_id = se2.id
+        where 1 = 1
+        <if test="params.teamName != null">
+            AND (t1.class_name LIKE CONCAT('%',#{params.teamName},'%')
+            OR
+            t2.class_name LIKE CONCAT('%',#{params.teamName},'%')
+            )
+        </if>
+        <if test="params.category != null">
+            AND e.category = #{params.category}
+        </if>
+        <if test="params.batchNO != null">
+            AND e.batch_no = #{params.batchNO}
+        </if>
+        <if test="params.type != null">
+            AND e.type = #{params.type}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+        ORDER BY e.update_time DESC, e.batch_no
+    </select>
+
+    <!-- 天天见分页查询列表 -->
+    <select id="queryDayEventPageList" resultType="com.sjht.school.football.resp.football.event.QueryEventPageListResp">
+        SELECT
+        e.id AS eventId,
+        e.event_name AS eventName,
+        s.site_name AS siteName,
+        t1.team_name AS team1Name,
+        t2.team_name AS team2Name,
+        e.team1_score AS team1Score,
+        e.team2_score AS team2Score,
+        e.start_time AS startTime,
+        e.end_time AS endTime,
+        g.grade_name AS period,
+        e.batch_no AS batchNo,
+        e.category,
+        e.type,
+        e.STATUS,
+        se.se_name AS seName,
+        se2.term,
+        se2.`year`
+        FROM
+        football_base_event e
+        INNER JOIN football_base_site s ON e.site_id = s.id
+        LEFT JOIN football_base_team t1 ON e.team1_id = t1.id
+        LEFT JOIN football_base_team t2 ON e.team2_id = t2.id
+        INNER JOIN base_grade g ON e.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        INNER JOIN base_season se ON e.season_id = se.id
+        INNER JOIN base_season se2 ON se.parent_id = se2.id
+        where 1 = 1 AND e.category = '1'
+        <if test="params.teamName != null">
+            AND (t1.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            OR
+            t2.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            )
+        </if>
+        <if test="params.category != null">
+            AND e.category = #{params.category}
+        </if>
+        <if test="params.batchNO != null">
+            AND e.batch_no = #{params.batchNO}
+        </if>
+        <if test="params.type != null">
+            AND e.type = #{params.type}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+        ORDER BY e.update_time DESC, e.batch_no
+    </select>
+
+    <!-- 课堂赛事分页查询列表数量 -->
+    <select id="queryClassroomEventPageCount" resultType="long">
+        SELECT
+        count(*)
+        FROM
+        football_base_event e
+        INNER JOIN football_base_site s ON e.site_id = s.id
+        LEFT JOIN football_base_team t1 ON e.team1_id = t1.id
+        LEFT JOIN football_base_team t2 ON e.team2_id = t2.id
+        INNER JOIN base_class c ON e.class_id = c.id
+        INNER JOIN base_grade g ON e.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        where 1 = 1
+        <if test="params.teamName != null">
+            AND (t1.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            OR
+            t2.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            )
+        </if>
+        <if test="params.category != null">
+            AND e.category = #{params.category}
+        </if>
+        <if test="params.batchNO != null">
+            AND e.batch_no = #{params.batchNO}
+        </if>
+        <if test="params.type != null">
+            AND e.type = #{params.type}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+    </select>
+
+    <!-- 嘉年华分页查询列表数量 -->
+    <select id="queryCarnivalEventPageCount" resultType="long">
+        SELECT
+        count(*)
+        FROM
+        football_base_event e
+        INNER JOIN football_base_site s ON e.site_id = s.id
+        LEFT JOIN base_class t1 ON e.team1_id = t1.id
+        LEFT JOIN base_class t2 ON e.team2_id = t2.id
+        INNER JOIN base_grade g ON e.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        where 1 = 1
+        <if test="params.teamName != null">
+            AND (t1.class_name LIKE CONCAT('%',#{params.teamName},'%')
+            OR
+            t2.class_name LIKE CONCAT('%',#{params.teamName},'%')
+            )
+        </if>
+        <if test="params.category != null">
+            AND e.category = #{params.category}
+        </if>
+        <if test="params.batchNO != null">
+            AND e.batch_no = #{params.batchNO}
+        </if>
+        <if test="params.type != null">
+            AND e.type = #{params.type}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+    </select>
+
+    <!-- 赛事分页查询列表数量 -->
+    <select id="queryDayEventPageCount" resultType="long">
+        SELECT
+        count(*)
+        FROM
+        football_base_event e
+        INNER JOIN football_base_site s ON e.site_id = s.id
+        LEFT JOIN football_base_team t1 ON e.team1_id = t1.id
+        LEFT JOIN football_base_team t2 ON e.team2_id = t2.id
+        INNER JOIN base_grade g ON e.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        where 1 = 1 AND e.category = '1'
+        <if test="params.teamName != null">
+            AND (t1.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            OR
+            t2.team_name LIKE CONCAT('%',#{params.teamName},'%')
+            )
+        </if>
+        <if test="params.category != null">
+            AND e.category = #{params.category}
+        </if>
+        <if test="params.batchNO != null">
+            AND e.batch_no = #{params.batchNO}
+        </if>
+        <if test="params.type != null">
+            AND e.type = #{params.type}
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+    </select>
+
+    <!-- 查询场地使得否被使用-->
+    <select id="querySiteIsUsed" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        football_base_event e
+        WHERE
+        e.site_id = #{ew.siteId}
+        AND e.start_time >= #{ew.startTime}
+        AND e.end_time <![CDATA[<= ]]> #{ew.endTime}
+    </select>
+
+    <!-- 查询两个战队在相同的时间段内是否已经又赛事 -->
+    <select id="queryIsHashEvent" resultType="int">
+        SELECT
+        COUNT(*)
+        FROM
+        football_base_event e
+        WHERE
+        e.team1_id = #{ew.team1Id}
+        AND e.team2_id = #{ew.team2Id}
+        AND e.start_time >= #{ew.startTime}
+        AND e.end_time <![CDATA[<= ]]> #{ew.endTime}
+    </select>
+
+    <!-- 查询赛事信息 -->
+    <select id="getEventInfo" resultType="com.sjht.school.football.resp.football.event.AddScoreResp">
+        SELECT
+            e.id AS eventId,
+            e.event_name AS eventName,
+          e.team1_id AS team1Id,
+          e.team2_id AS team2Id,
+          t1.team_name AS team1Name,
+            t2.team_name AS team2Name,
+            e.team1_score AS team1Score,
+            e.team2_score AS team2Score
+        FROM
+            football_base_event e
+            INNER JOIN football_base_team t1 ON e.team1_id = t1.id
+            INNER JOIN football_base_team t2 ON e.team2_id = t2.id
+          WHERE e.id = #{eventId}
+          LIMIT 1
+    </select>
+
+    <update id="updateScore">
+        UPDATE `football_base_event`
+        SET
+        `team1_score` = #{ew.team1Score},
+        `team2_score` = #{ew.team2Score}
+        WHERE
+            `id` = #{ew.eventId};
+    </update>
+
+    <update id="updateStatus">
+        UPDATE football_base_event set `status` = 2, update_time = CURRENT_TIMESTAMP WHERE id = #{eventId}
+    </update>
+
+    <!-- 根据球队名和类型查询赛事信息 -->
+    <select id="showEvent" resultType="com.sjht.school.football.resp.football.event.EventInfoResp">
+        SELECT
+            e.id AS eventId,
+            e.event_name AS eventName,
+            t1.team_name AS team1Name,
+            t2.team_name AS team2Name,
+            e.team1_score AS team1Score,
+            e.team2_score AS team2Score,
+            e.status
+        FROM
+            football_base_event e
+
+            where e.team1_id =  {#teamId}
+            or   e.team2_id  =  {#teamId}
+    </select>
+    <!-- 赛事提交编辑 -->
+    <update id="submitEditeEvent">
+        UPDATE `football_base_event`
+        SET
+        `batch_no` = #{ew.batchNo},
+        `site_id` = #{ew.siteId},
+        `status` = #{ew.status},
+        update_time = CURRENT_TIMESTAMP
+        WHERE
+            `id` = #{ew.eventId}
+    </update>
+    <select id="evetIsEnd" resultType="int">
+        SELECT
+        COUNT( * )
+        FROM
+        football_base_event e
+        WHERE
+        e.`status` != 2 AND e.category = #{params.category}
+        <if test="params.category == 1">
+            AND e.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.category == 2">
+            AND e.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.category == 3">
+            AND e.class_id = #{params.classId}
+        </if>
+    </select>
+
+    <update id="updateEventTeam1score">
+        UPDATE `football_base_event`
+        SET
+            `team1_score` = team1_score + #{ew.score},
+            `update_time` = CURRENT_TIMESTAMP
+        WHERE
+            `id` = #{ew.eventId}
+    </update>
+
+    <update id="updateEventTeam2score">
+        UPDATE `football_base_event`
+        SET
+            `team2_score` = team2_score + #{ew.score},
+            `update_time` = CURRENT_TIMESTAMP
+        WHERE
+            `id` = #{ew.eventId}
+    </update>
+
+    <!-- 查询该届或该班级在该学年该学期该赛事是否已经加入-->
+    <select id="seasonAlreadyCreate" resultType="String">
+        SELECT DISTINCT
+          se.id
+        FROM
+            football_base_event e
+            INNER JOIN base_season se ON e.season_id = se.id
+            INNER JOIN base_season se2 ON se.parent_id = se2.id
+        WHERE
+            1 = 1
+            <choose>
+                <when test="params.category == 3">
+                    AND se2.`year` = #{params.year}
+                    AND se2.term = #{params.term}
+                    AND e.class_id = #{params.classId}
+                    AND e.category = '3'
+                    AND se.id = #{params.seasonId}
+                </when>
+                <otherwise>
+                    AND se2.`year` = #{params.year}
+                    AND se2.term = #{params.term}
+                    AND e.grade_id = #{params.gradeId}
+                    AND e.category = '1'
+                    AND se.id = #{params.seasonId}
+                </otherwise>
+            </choose>
+
+    </select>
+
+    <!-- 查询当天所有已完成的赛事-->
+    <select id="showTodayEvent" resultType="com.sjht.school.football.entity.football.event.EventEntity">
+        SELECT
+	 e.team1_id AS team1Id,
+	 e.team2_id AS team2Id,
+	 e.team1_score AS team1Score,
+	 e.team1_score AS team2Score
+FROM
+	`football_base_event` e
+WHERE
+	`status` = 2
+	AND DATE(update_time) &lt;= CURDATE()
+
+    </select>
+
+
+</mapper>

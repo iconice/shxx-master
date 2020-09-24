@@ -1,0 +1,201 @@
+<form class="form-horizontal" id="outoDetailForm">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">栏目 :</label>
+        <div class="col-sm-8">
+            <label class="radio-inline pr-5 type"><input type="radio" name="auto_category" value="1" id="type-day">
+                天天见</label>
+            <!--<label class="radio-inline pr-5 type"><input type="radio" name="auto_category" value="2" id="type-carnival"> 嘉年华</label>-->
+            <label class="radio-inline pr-5 type"><input type="radio" name="auto_category" value="3" id="type-classroom"
+                                                         checked="checked"> 课堂联赛</label>
+        </div>
+    </div>
+    <div class="form-group classes gradeId">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="auto_gradeId">届 :</label>
+            <div class="col-xs-5">
+                <select name="auto_gradeId" class="form-control" id="auto_gradeId" onchange="switchPeriod()">
+                    <option th:each="supplier : ${grades}" th:value="${supplier.gradeId}"
+                            th:text="${supplier.gradeName}">
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="form-group classes">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="auto_classId">班级 :</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="auto_classId" onchange="switchClass()">
+                    <option th:each="supplier : ${classes}" th:value="${supplier.classId}"
+                            th:text="${supplier.className}">
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="seasonId">赛季:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="seasonId">
+                    <option th:each="supplier : ${seasons}" th:value="${supplier.seId}"
+                            th:text="${supplier.seName}">
+                    </option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-9">
+            <label class="control-label col-xs-4" for="auto_type">赛事类型:</label>
+            <div class="col-xs-5">
+                <select class="form-control" id="auto_type">
+                    <option value="1">2V2</option>
+                    <option value="2">3V3</option>
+                    <option value="3">5V5</option>
+                    <option value="4">沙滩足球</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="pull-right">
+            <button type="button" id="outo_createEvent" class="btn btn-info">确定</button>
+            <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+        </div>
+    </div>
+    <!-- /.box-footer -->
+</form>
+<script>
+    var team2IsStr; // 队伍2的字符串
+    $(function () {
+        /*创建赛事*/
+        $("#outo_createEvent").click(function () {
+            Core.mask("#outo_createEvent");
+            var classId = $("#auto_classId").val();
+            var category = $('input:radio[name="auto_category"]:checked').val();
+            var gradeId = $("#auto_gradeId").val();
+            var siteId = $("#auto_siteId").val();
+            var type = $("#auto_type").val();
+            var seasonId = $("#seasonId").val();
+            Core.postAjax('/event/autoCreateEvent', {
+                classId: classId,
+                seasonId: seasonId,
+                category: category,
+                gradeId: gradeId,
+                siteId: siteId,
+                type: type
+            }, function (data) {
+                Core.unmask("#outo_createEvent");
+                if (data.code == 100000003) {
+                    $("#autoCreateEventModal").modal("hide");
+                    $("#myModal").modal("hide");
+                    Core.refreshTable("#table",true);
+                }
+                layer.msg(data.msg);
+            })
+            // }
+        });
+
+
+        $('input:radio[name="auto_category"]').click(function () {
+            var eventType = $('input:radio[name="auto_category"]:checked').val();
+            if (eventType == 1) {
+                // Core.refreshTable("#auto_team2Table");
+                $(".classes").hide();
+                $(".gradeId").show();
+            } else if (eventType == 2) {
+                getClassList();
+                $(".classes").hide();
+                $(".gradeId").show();
+                // Core.refreshTable("#auto_team2Table");
+                // console.log(eventType);
+            } else if (eventType == 3) {
+                getClassList();
+                // Core.refreshTable("#auto_team2Table");
+                $(".classes").show();
+            }
+        });
+    });
+
+    /*查询班级*/
+    function getClassList() {
+        var gradeId = $("#auto_gradeId").val();
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getClassList",
+            data: {
+                gradeId: gradeId
+            },
+            success: function (datas) {
+                var teamsOptions;
+                document.getElementById("auto_classId").options.length = 0;
+                var teamsOptions = "";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions += "<option value='" + d.classId + "'>" + d.className + "</option>";
+                }
+                $("#auto_classId").append(teamsOptions);
+            }
+        });
+    }
+
+    /*切换班级*/
+    function switchClass() {
+        // Core.refreshTable("#auto_team2Table");
+    }
+
+    /*切换届*/
+    function switchPeriod() {
+        getClassList();
+        // Core.refreshTable("#auto_team2Table");
+    }
+
+    var columns = [
+        {
+            checkbox: true,
+            formatter: function (value, row, index) {
+                console.log(row);
+                if (row.isChoose == 1) {
+                    return {
+                        disabled: true,
+                        striped: true
+                    }
+                }
+
+            }
+        }, {
+            field: 'teamId',
+            title: '球队id',
+            align: "center"
+        }, {
+            field: 'teamName',
+            title: '球队名称',
+            align: "center"
+        }];
+    var options = {
+        id: "#auto_team2Table",
+        url: '/team/getTeamOtherList',
+        columns: columns,
+        queryParams: queryParams
+    }
+
+    function queryParams(params) {
+        var temp = {
+            gradeId: $("#auto_gradeId").val(),
+            classId: $("#auto_classId").val(),
+            team1Id: $("#auto_team1Id").val(),
+            type: $('input:radio[name="auto_category"]:checked').val()
+        };
+        return temp;
+    }
+
+    // 加载列表
+    // Core.initTable(options);
+
+</script>

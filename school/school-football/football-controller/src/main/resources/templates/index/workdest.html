@@ -1,0 +1,81 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 首页</a></li>
+        <li class="active">工作台</li>
+    </ol>
+</section>
+<!-- Main content -->
+<section class="content">
+    <div class="box box-default">
+        <div class="box-header with-border">
+            <h3 class="box-title">校园足球</h3>
+
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+        <div class="box-body">
+            <div style="padding: 10px 0 20px 10px;">
+                <h3>&nbsp;&nbsp;&nbsp;项目介绍</h3>
+
+                <h3>&nbsp;&nbsp;&nbsp;获取帮助</h3>
+
+                <h3>&nbsp;&nbsp;&nbsp;开发留言板</h3>
+                <textarea id="memo" cols="60" rows="10"></textarea>
+                <input type="button" value="发布" onclick="saveStorage('memo')" />
+                <input type="button" value="清空" onclick="clearStorage('msg')" />
+                <hr />
+                <p id="msg"></p>
+                <script type="text/javascript">
+
+                    function saveStorage(id) {
+                        //获取textarea的value值
+                        var data = document.getElementById(id).value;
+                        //获取当前时间戳
+                        var time = new Date().getTime();
+                        //将时间戳作为键值，textarea的value值作为键值的内容保存在本地数据库
+                        localStorage.setItem(time,data);
+                        //保存成功后提示成功
+                        console.log("数据已保存");
+                        //设置loadStorage函数的传参（ID值）
+                        loadStorage('msg');
+                    }
+
+                    function loadStorage(id) {
+                        var result = '<table border="1">';
+                        //遍历本地数据所有内容
+                        for(var i = 0; i < localStorage.length; i++) {
+                            //获取每一条新增的键值
+                            var kes = localStorage.key(i);
+                            //获取新增键值的内容
+                            var value = localStorage.getItem(kes);
+                            //获取时间对象
+                            var date = new Date();
+                            //将时间戳转化为正常时间 Mon Jun 19 1972 11:12:44 GMT+0800 (中国标准时间) 的格式
+                            date.setTime(kes);
+                            //将转化后的内容变成字符串
+                            var datestr = date.toGMTString();
+                            //将所有新增内容添加到result变量中
+                            result += '<tr><td>' + value + '</td><td>' + datestr + '</td></tr>'
+                        }
+                        result += '</table>';
+                        var target = document.getElementById(id);
+                        //将所有内容添加到元素中显示
+                        target.innerHTML = result;
+
+                    }
+
+                    function clearStorage() {
+                        //清除本地储存所有内容
+                        localStorage.clear();
+                        console.log("清除完毕");
+                    }
+                </script>
+
+            </div>
+        </div>
+    </div>
+</section>
+

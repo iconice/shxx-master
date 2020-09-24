@@ -1,0 +1,194 @@
+<form class="form-horizontal" id="addPlayersForm">
+    <input id="teamId" class="hidden" name="teamId" th:value="${teamId}">
+    <input id="type" class="hidden" name="type" th:value="${type}">
+    <input id="teamCount" class="hidden" name="count" th:value="${count}">
+    <input id="gradeId" class="hidden" name="period" th:value="${gradeId}">
+    <div class="form-group">
+        <label class="col-sm-3 control-label">性别 :</label>
+        <div class="col-sm-8">
+            <label class="radio-inline pr-5 type"><input type="radio" name="sex" value="" id="sex-all"
+                                                         checked="checked"> 全部</label>
+            <label class="radio-inline pr-5 type"><input type="radio" name="sex" value="0" id="sex-male"> 男</label>
+            <label class="radio-inline pr-5 type"><input type="radio" name="sex" value="1" id="sex-female"> 女</label>
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="form-group classes" hidden="tue">
+            <label class="col-sm-3 control-label">班级 :</label>
+            <div class="col-sm-8">
+                <select onchange="switchClass()" id="addPlayersClassId" name="addPlayersClassId" class="form-control" require="必填项">
+
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">姓名 :</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" name="studentNname" id="studentNname" placeholder="输入姓名搜索">
+            </div>
+        </div>
+    </div>
+    <div class="modal-body">
+        <table id="addPlayersTable">
+        </table>
+    </div>
+    <!-- /.box-body -->
+    <div class="box-footer">
+        <div class="pull-right">
+            <button type="button" id="savePlayers" class="btn btn-info">确定</button>
+            <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+        </div>
+    </div>
+    <!-- /.box-footer -->
+</form>
+<script>
+    var loadPlayersCount = 0;
+    $(function () {
+        /*查询班级*/
+        getClassList();
+        /*查询班级*/
+        showType();
+
+        /*切换nannv*/
+        $('input:radio[name="sex"]').click(function () {
+            Core.refreshTable("#addPlayersTable");
+        });
+
+        $("#savePlayers").click(function () {
+            var checkedRows = Core.selectMutiData("#addPlayersTable");
+            if (checkedRows) {
+                var length = checkedRows.length;
+                var count = $("#teamCount").val();
+                console.log(length);
+                console.log( $('#teamCount').val());
+                if(length > count){
+                    layer.msg("队员上限人数为："+ count+ "人,人数超过了：" + length+ "人");
+                    return;
+                }
+                Core.mask("#savePlayers");
+                var studentIdStr = "";
+                $.each(checkedRows, function (i, item) {
+                    // 以前选择的不加入
+                    if (item.isSelect == 0) {
+                        studentIdStr += (item.studentId + ",");
+                    }
+                });
+                studentIdStr = studentIdStr.substring(0, studentIdStr.length - 1);
+                console.log(studentIdStr);
+                Core.postAjax('/teamPlayers/addTeamPlayers', {
+                    teamId: $("#teamId").val(),
+                    studentIdStr: studentIdStr
+                }, function (data) {
+                    Core.unmask("#savePlayers");
+                    if (data.code == 100000003) {
+                        $("#addPlayersDetailModal").modal("hide");
+                        Core.refreshTable("#table");
+                    }
+                    layer.msg(data.msg);
+                })
+            }
+        });
+
+        $("#studentNname").blur(function () {
+
+            Core.refreshTable("#addPlayersTable");
+        });
+
+
+    });
+
+    /*是否展示届和班级*/
+    function showType() {
+        var type = $('#type').val();
+        if (type == 1) {
+            $(".classes").show();
+        }
+    }
+
+    /*切换班级*/
+    function switchClass() {
+        Core.refreshTable("#addPlayersTable");
+    }
+
+    /*查询班级*/
+    function getClassList() {
+        var gradeId;
+        var type = $('#type').val();
+        if (type == 1) {
+            gradeId = $("#gradeId").val();
+        } else {
+            return null;
+        }
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getClassList",
+            data: {
+                gradeId: gradeId
+            },
+            success: function (datas) {
+                var teamsOptions;
+                document.getElementById("addPlayersClassId").options.length = 0;
+                var teamsOptions = "<option value=''>==选择班级==</option>";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions += "<option value='" + d.classId + "'>" + d.className + "</option>";
+                }
+                $("#addPlayersClassId").append(teamsOptions);
+            }
+        });
+    }
+
+    var playersColumns = [
+        {
+            checkbox: true,
+            formatter: function (value, row, index) {//设置满足条件的行可以使用复选框
+                console.log(row);
+                if (row.isSelect == 1) {
+                    return {
+                        checked: true,
+                        disabled : true
+                    }
+                }
+            }
+        }, {
+            field: 'studentId',
+            title: '学生ID',
+            align: "center"
+        }, {
+            field: 'studentName',
+            title: '学生姓名',
+            align: "center"
+        }, {
+            field: 'sex',
+            title: '性别',
+            align: "center",
+            formatter: function (value, row, index) {
+                return row.sex == 0 ? '男' : '女';
+            }
+        }, {
+            field: 'className',
+            title: '所在班级',
+            align: "center"
+        }];
+    var roleOptions = {
+        id: "#addPlayersTable",
+        url: "/student/getStudentList",
+        columns: playersColumns,
+        queryParams: queryPlayersParams
+    }
+    Core.initTable(roleOptions);
+
+    function queryPlayersParams(params) {
+        var temp = {
+            teamId: $("#teamId").val(),
+            sex: $('input:radio[name="sex"]:checked').val(),
+            type: $("#type").val(),
+            gradeId: $("#gradeId").val(),
+            classId: $("#addPlayersClassId").val(),
+            studentName: $("#studentNname").val()
+        };
+        return temp;
+    }
+
+</script>

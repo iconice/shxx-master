@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+	<!-- 文件输出格式 ：日期 | 日志级别 [日志线程] 日志所在的类的全类名 [日志发生所在类的行号] -| 日志信息 -->
+	<property name="PATTERN" value="%-12(%d{yyyy-MM-dd HH:mm:ss.SSS}) |-%-5level [%thread] %c [%L] -| %msg%n" />
+	<!-- dev文件路径 -->
+	<property name="DEV_FILE_PATH" value="logs" />
+	<!-- test文件路径 -->
+	<property name="TEST_FILE_PATH" value="logs" />
+	<!-- pre(预发布)文件路径 -->
+	<property name="PRE_FILE_PATH" value="logs" />
+	<!-- pro文件路径 -->
+	<property name="PRO_FILE_PATH" value="logs" />
+	<!-- 日志文件的大小 -->
+	<property name="FILESIZE" value="200MB" />
+	<!-- 日志文件保存天数 -->
+	<property name="MAXHISTORY" value="30" />
+	
+	<!-- 开发环境：开始 -->
+	<springProfile name="dev">	
+		<!-- 控制台打印 -->
+		<appender name="STDOUT"
+			class="ch.qos.logback.core.ConsoleAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+		</appender>
+		<!-- ERROR 输入到文件，按日期和文件大小 -->
+		<appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<!-- 设置日志的显示格式 -->
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<!-- 消息过滤  ERROR执行日志，否则抛弃-->
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>ERROR</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<!--时间回滚，当天的记录记录在当天的已时间命名的文件中-->
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<!-- 每天保存一次 -->
+				<fileNamePattern>${DEV_FILE_PATH}%d/error.%i.log</fileNamePattern>
+				<!-- 保存时间单位为天 -->
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<!--文件的大小 -->
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>	
+		
+		<!-- WARN 输入到文件，按日期和文件大小 -->
+		<appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>WARN</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/warn.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+		<!-- INFO 输入到文件，按日期和文件大小 -->
+		<appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>INFO</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/info.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+	
+		<!-- DEBUG 输入到文件，按日期和文件大小 -->
+		<appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>DEBUG</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/debug.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+		
+		<!-- TRACE 输入到文件，按日期和文件大小 -->
+		<appender name="TRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>TRACE</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/trace.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+		
+		<!-- SQL相关日志输出 -->
+		<logger name="org.apache.ibatis" level="DEBUG" additivity="false" />
+		<logger name="org.mybatis.spring" level="DEBUG" additivity="false" />
+		<logger name="com.github.miemiedev.mybatis.paginator" level="DEBUG" additivity="false" />
+		
+		<!-- Logger 根目录 （日志级别）-->
+		<root level="DEBUG">
+			<appender-ref ref="STDOUT" />
+			<appender-ref ref="DEBUG" />
+			<appender-ref ref="ERROR" />
+			<appender-ref ref="WARN" />
+			<appender-ref ref="INFO" />
+			<appender-ref ref="TRACE" />
+		</root>
+	</springProfile>
+	<!-- 开发环境：结束 -->
+	
+	<!-- 测试环境：开始 -->
+	<springProfile name="test">
+		<!-- 控制台打印 -->
+		<appender name="STDOUT"
+				  class="ch.qos.logback.core.ConsoleAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+		</appender>
+		<!-- ERROR 输入到文件，按日期和文件大小 -->
+		<appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<!-- 设置日志的显示格式 -->
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<!-- 消息过滤  ERROR执行日志，否则抛弃-->
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>ERROR</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<!--时间回滚，当天的记录记录在当天的已时间命名的文件中-->
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<!-- 每天保存一次 -->
+				<fileNamePattern>${DEV_FILE_PATH}%d/error.%i.log</fileNamePattern>
+				<!-- 保存时间单位为天 -->
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<!--文件的大小 -->
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+
+		<!-- WARN 输入到文件，按日期和文件大小 -->
+		<appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>WARN</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+					class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/warn.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy
+						class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+		<!-- INFO 输入到文件，按日期和文件大小 -->
+		<appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>INFO</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+					class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/info.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy
+						class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+
+		<!-- DEBUG 输入到文件，按日期和文件大小 -->
+		<appender name="DEBUG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>DEBUG</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+					class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/debug.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy
+						class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+
+		<!-- TRACE 输入到文件，按日期和文件大小 -->
+		<appender name="TRACE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>TRACE</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+					class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${DEV_FILE_PATH}%d/trace.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+
+		<!-- SQL相关日志输出 -->
+		<logger name="org.apache.ibatis" level="DEBUG" additivity="false" />
+		<logger name="org.mybatis.spring" level="DEBUG" additivity="false" />
+		<logger name="com.github.miemiedev.mybatis.paginator" level="DEBUG" additivity="false" />
+
+		<!-- Logger 根目录 （日志级别）-->
+		<root level="DEBUG">
+			<appender-ref ref="STDOUT" />
+			<appender-ref ref="DEBUG" />
+			<appender-ref ref="ERROR" />
+			<appender-ref ref="WARN" />
+			<appender-ref ref="INFO" />
+			<appender-ref ref="TRACE" />
+		</root>
+	</springProfile>
+	<!-- 测试环境：结束 -->
+	
+	<!-- 预发布环境：开始 -->
+	<springProfile name="pre">	
+		<!-- ERROR 输入到文件，按日期和文件大小 -->
+		<appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<!-- 设置日志的显示格式 -->
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<!-- 消息过滤  ERROR执行日志，否则抛弃-->
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>ERROR</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<!--时间回滚，当天的记录记录在当天的已时间命名的文件中-->
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<!-- 每天保存一次 -->
+				<fileNamePattern>${PRE_FILE_PATH}%d/error.%i.log</fileNamePattern>
+				<!-- 保存时间单位为天 -->
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<!--文件的大小 -->
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>	
+		
+		<!-- WARN 输入到文件，按日期和文件大小 -->
+		<appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>WARN</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<rollingPolicy
+				class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<fileNamePattern>${PRE_FILE_PATH}%d/warn.%i.log</fileNamePattern>
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy
+					class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>
+		
+		<!-- SQL相关日志输出 -->
+		<logger name="org.apache.ibatis" level="WARN" additivity="false" />
+		<logger name="org.mybatis.spring" level="INFO" additivity="false" />
+		<logger name="com.github.miemiedev.mybatis.paginator" level="INFO" additivity="false" />
+		
+		<!-- Logger 根目录 （日志级别）-->
+		<root level="WARN">
+			<appender-ref ref="ERROR" />
+			<appender-ref ref="WARN" />
+		</root>
+	</springProfile>
+	<!-- 预发布环境：结束 -->
+	
+	<!-- 生产环境：开始 -->
+	<springProfile name="prod">	
+		<!-- ERROR 输入到文件，按日期和文件大小 -->
+		<appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<!-- 设置日志的显示格式 -->
+			<encoder charset="utf-8">
+				<pattern>${PATTERN}</pattern>
+			</encoder>
+			<!-- 消息过滤  ERROR执行日志，否则抛弃-->
+			<filter class="ch.qos.logback.classic.filter.LevelFilter">
+				<level>ERROR</level>
+				<onMatch>ACCEPT</onMatch>
+				<onMismatch>DENY</onMismatch>
+			</filter>
+			<!--时间回滚，当天的记录记录在当天的已时间命名的文件中-->
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+				<!-- 每天保存一次 -->
+				<fileNamePattern>${PRO_FILE_PATH}%d/error.%i.log</fileNamePattern>
+				<!-- 保存时间单位为天 -->
+				<maxHistory>${MAXHISTORY}</maxHistory>
+				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+					<!--文件的大小 -->
+					<maxFileSize>${FILESIZE}</maxFileSize>
+				</timeBasedFileNamingAndTriggeringPolicy>
+			</rollingPolicy>
+		</appender>	
+		<!-- Logger 根目录 （日志级别）-->
+		<root level="ERROR">
+			<appender-ref ref="ERROR" />
+		</root>
+	</springProfile>
+	<!-- 生产环境：结束 -->
+</configuration>

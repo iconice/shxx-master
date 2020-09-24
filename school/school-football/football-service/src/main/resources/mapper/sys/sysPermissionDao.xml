@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.sys.SysPermissionDao">
+
+    <!--查询菜单-->
+    <select id="getMenuListByUserId" resultType="com.sjht.school.football.entity.PermissionEntity">
+        SELECT DISTINCT
+            p.id,
+            p.name,
+            p.description,
+            p.url,
+            p.parent_id AS parentId,
+            p.icon,
+            p.order_num AS orderNum
+        FROM
+            sys_permission p
+            LEFT JOIN sys_con_role_permission rp ON p.id = rp.permission_id
+            LEFT JOIN sys_con_user_role ur ON rp.role_id = ur.role_id
+        WHERE
+            ur.user_id = #{userId}
+            AND p.type IN ( 0, 1 )
+            AND p.STATUS = 1
+        ORDER BY
+            p.order_num
+    </select>
+
+    <!--得到菜单-->
+    <select id="getAllMenu" resultType="com.sjht.school.football.resp.sys.GetAllMenuResp">
+        SELECT
+            id,
+            `name`,
+            parent_id AS parentId,
+            `type`
+        FROM
+            sys_permission
+        WHERE
+            STATUS = 1
+            AND `type` IN ( 0, 1 )
+        ORDER BY
+            order_num
+    </select>
+
+    <!--查询权限参数-->
+    <select id="getPermissions" resultType="java.lang.String">
+        SELECT DISTINCT
+            p.perms
+        FROM
+            sys_permission p
+            LEFT JOIN sys_con_role_permission rp ON p.id = rp.permission_id
+            LEFT JOIN sys_con_user_role ur ON rp.role_id = ur.role_id
+        WHERE
+            p.perms IS NOT NULL
+            AND p.perms != ''
+            AND p.STATUS = 1
+            AND ur.user_id = #{userId}
+    </select>
+
+    <!-- 查询资源列表 -->
+    <select id="queryPermissionList" resultType="com.sjht.school.football.resp.sys.QueryPermissionListResp">
+        SELECT
+            p.id,
+            p.`name`,
+            p.parent_id AS parentId,
+            p.icon,
+            p.type,
+            p.url,
+            p.perms,
+            p.order_num AS orderNum,
+            p.description
+        FROM
+            sys_permission p
+        WHERE status = 1
+        ORDER BY p.order_num
+    </select>
+    <!-- 更新权限 -->
+    <update id="updatePermission">
+        UPDATE `sys_permission`
+            SET
+            `name` = #{ew.name},
+            `description` = #{ew.description},
+            `url` = #{ew.url},
+            `perms` = #{ew.perms},
+            `parent_id` = #{ew.parentId},
+            `order_num` = #{ew.orderNum},
+            `icon` = #{ew.icon},
+             update_time=now()
+            WHERE
+                `id` = #{ew.id}
+    </update>
+
+    <!--通过叫色id查询资源-->
+    <select id="findByRoleId" resultType="com.sjht.school.football.entity.PermissionEntity">
+        SELECT
+            a.permission_id AS id,
+            b.NAME,
+            b.parent_id AS  parentId
+        FROM
+            sys_con_role_permission a
+            LEFT JOIN sys_permission b ON a.permission_id = b.id
+        WHERE
+            a.role_id = #{roleId} and b.status=1
+    </select>
+</mapper>

@@ -1,0 +1,476 @@
+<!-- 头部 -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 首页</a></li>
+        <li><a href="#">球队管理</a></li>
+        <li class="active">球队信息</li>
+    </ol>
+</section>
+<!-- 查询部分 -->
+<section class="content">
+    <div class="jax-box">
+        <form id="formSearch" class="form-horizontal form-search">
+            <div class="form-group">
+                <div class="col-md-3 col-sm-6">
+                    <label class="col-sm-3 control-label">选择届:</label>
+                    <div class="col-sm-8">
+                        <select id="gradeId" name="gradeId" class="form-control" onchange="switchPeriod()">
+                            <option th:each="supplier : ${grades}" th:value="${supplier.gradeId}"
+                                    th:text="${supplier.gradeName}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 classId_class">
+                    <label  class="control-label  col-sm-3" for="classId">班级 :</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="classId" onchange="switchClass()">
+
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-xs-8">
+                    <label class="control-label  col-xs-3" for="teamName">球队名称:</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="teamName" onblur="searchName()">
+                    </div>
+                </div>
+                <!--TO-DO-->
+                <div class="col-md-3 col-sm-8">
+                    <label class="control-label  col-xs-3" for="sex">球队类型:</label>
+                    <div class="col-xs-8">
+                        <select class="form-control" id="teamType" onchange="switchType()">
+                            <option value="3">课堂联赛</option>
+                            <option value="1">天天见</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="jax-box jax-box-table">
+        <div id="toolbar" class="btn-group">
+            <button id="addTeamButton" type="button" class="btn btn-primary" data-toggle="modal">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+            </button>
+        </div>
+        <!--  数据列表 -->
+        <table id="table"></table>
+    </div>
+</section>
+<!-- 添加球员模态框 -->
+<div id="addTeamPlayersModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">添加球员</h4>
+            </div>
+            <form id="formSearch1" class="form-horizontal form-search">
+                <div class="form-group">
+                    <div class="col-xs-9">
+                        <label class="control-label  col-xs-4" for="sex">性别 :</label>
+                        <div class="col-xs-5">
+                            <select onchange="sexSwitch()" class="form-control" id="sex">
+                                <option value=''>选择性别</option>
+                                <option value="0">男</option>
+                                <option value="1">女</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-body">
+                <table id="addTeamPlayersTable">
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-right">
+                    <button type="button" id="saveTeamPlayers" class="btn btn-info">确定</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="lookPlayersModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">球员列表</h4>
+            </div>
+            <div class="jax-box jax-box-table">
+                <div id="toolbar2" class="btn-group">
+                    <button id="btn_del" type="button" class="btn btn-danger" data-toggle="modal"
+                            onclick="bathDeletePlayers()">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>一键清空球员
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="lookPlayersTable">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 赛事创建模态框 -->
+<div id="addPlayersDetailModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">添加球员</h4>
+            </div>
+            <div class="modal-body">
+                <div id="addPlayersDetailOpenWindow">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 添加球队 -->
+<div id="addTeamModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">创建球队</h4>
+            </div>
+            <div class="modal-body">
+                <div id="teamOpenWindow">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var selectPlayersIds;
+    var disablePlayersIds;
+    var teamIdChecked;
+    var studentIdStr;//分配的球员
+    var loadPlayersCount = 0;
+    var lookPlayersCount = 0;
+    var playersCount; // 每个队伍的上限人数
+    var lookTeamId;
+    var type;
+    var sex = 0;
+    var columns = [
+        {checkbox: true},
+        {
+            field: 'gradeName',
+            title: '所属届',
+            align: "center"
+        },
+        {
+            field: 'className',
+            title: '所属班级',
+            align: "center"
+        },
+        {
+            field: 'teamName',
+            title: '球队名称',
+            align: "center"
+        }, {
+            field: 'count',
+            title: '球队上限人数',
+            align: "center"
+        }, {
+            field: 'creater',
+            title: '创建人',
+            align: "center"
+        }, {
+            field: 'joinCount',
+            title: '加入人数',
+            align: "center"
+        }, {
+            field: 'teamType',
+            title: '球队类型',
+            align: "center",
+            formatter: function (value, row, index) {
+                if (row.teamType == 1) {
+                    return "天天见";
+                } else if (row.teamType == 2) {
+                    return "嘉年华";
+                } else if (row.teamType == 3) {
+                    return "课堂足球联赛";
+                } else {
+                    return "未知";
+                }
+            }
+        }, {
+            field: 'operation',
+            title: '操作',
+            align: "center",
+            formatter: function (value, row, index) {
+                var look = "";
+                var del = "";
+                if (row.joinCount == 0) {
+                    del = '<a  class="table-btn table-btn-danger" href="javascript:void(0)" onclick="deleteTeam(' + row.teamId + ')">删除</a>';
+                } else {
+                    look = '<a class="table-btn table-btn-info" href="javascript:void(0)" onclick="lookPlayers(' + row.teamId+ ',' + row.teamType + ')">查看球员</a>';
+                }
+                var players = '<a class="table-btn table-btn-info" href="javascript:void(0)" onclick="addTeamPlayersList(' + row.teamId + ',' + row.count + ',' + row.teamType + ',' + row.gradeId + ')">添加球员</a>';
+                return look + del + players;
+            }
+        }];
+    var options = {
+        id: "#table",
+        url: '/team/queryTeamPageList',
+        columns: columns,
+        toolbar: '#toolbar',
+        showRefresh: true,
+        queryParams: queryParams
+    }
+
+    // 加载列表
+    Core.initTable(options);
+
+    /*查询用户参数*/
+    function queryParams(params) {
+        var temp = { //这里的键的名字和控制器的变量名必须一致，这边改动，控制器也需要改成一样的
+            limit: params.limit, //页面大小
+            offset: params.offset, //页码
+            teamName: $("#teamName").val(),
+            count: $("#count").val(),
+            teamType: $("#teamType").val(),
+            classId: $("#classId").val(),
+            gradeId: $("#gradeId").val()
+        };
+        return temp;
+    }
+
+    /*得到添加成员参数*/
+    function queryAddPlayesParams(params) {
+        var temp = {
+            sex: $("#sex").val(),
+        };
+        return temp;
+    }
+
+    function switchType() {
+        var teamType = $("#teamType").val();
+        if (teamType == 1) { // 天天见
+            $(".classId_class").hide();
+        } else if (teamType == 3){
+            $(".classId_class").show();
+        }
+        getClassList();
+        Core.refreshTable("#table");
+    }
+
+    /*删除*/
+    function deleteTeam(teamId) {
+        Core.confirm("确定删除该球队？", function () {
+            Core.postAjax("/team/deleteTeam", {"teamId": teamId}, function (data) {
+                if (data.code == 100000003) {
+                    Core.refreshTable("#table");
+                }
+                layer.msg(data.msg);
+            }, "get")
+        })
+    }
+
+    function lookPlayers(teamId, teamType) {
+        lookTeamId =teamId;
+        type=teamType;
+        $("#lookPlayersModal").modal("show");
+        if (lookPlayersCount == 0) {
+            var roleColumns = [
+                {checkbox: true},
+                {
+                    field: 'studentId',
+                    title: '学生ID',
+                    align: "center"
+                }, {
+                    field: 'studentName',
+                    title: '学生姓名',
+                    align: "center"
+                }, {
+                    field: 'sex',
+                    title: '性别',
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        return row.sex == 0 ? '男' : '女';
+                    }
+                }, {
+                    field: 'operation',
+                    title: '操作',
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        var del = '<a  class="table-btn table-btn-danger" href="javascript:void(0)" onclick="deletePlayers(' + lookTeamId + ',' + row.studentId + ')">移除</a>';
+                        return del;
+                    }
+                }];
+            var lookPlayersOptions = {
+                id: "#lookPlayersTable",
+                url: "/student/getPlayersList/",
+                columns: roleColumns,
+                queryParams: lookPlayersParams,
+                onLoadSuccess: function () {  //加载成功时执行
+                    lookPlayersCount = 1;
+                },
+            }
+            Core.initTable(lookPlayersOptions);
+        } else {
+            Core.refreshTable("#lookPlayersTable");
+        }
+    }
+
+    /*删除球队成员*/
+    function deletePlayers(teamId, studentId) {
+        Core.confirm("确定删除该球队成员？", function () {
+            Core.postAjax("/team/deletePlayers", {"teamId": teamId, "studentId": studentId}, function (data) {
+                if (data.code == 100000003) {
+                    Core.refreshTable("#Table");
+                    $("#lookPlayersModal").modal("hide");
+                }
+                layer.msg(data.msg);
+            }, "get")
+        })
+    }
+
+    /*删除球队中所有成员*/
+    function bathDeletePlayers() {
+        // var checkedRows= Core.selectMutiData("#lookPlayersTable");
+        //console.log(checkedRows);
+        //if (checkedRows) {
+        Core.confirm("确定删除该球队所有成员？", function () {
+            Core.postAjax("/team/deleteAllPlayers", {"teamId": lookTeamId}, function (data) {
+                if (data.code == 100000003) {
+                    Core.refreshTable("#table");
+                    $("#lookPlayersModal").modal("hide");
+                }
+                layer.msg(data.msg);
+            }, "get")
+        })
+        //}
+    }
+
+    /*查询角色参数*/
+    function lookPlayersParams(params) {
+        var temp = {
+            teamId: lookTeamId,
+            type: type
+        };
+        return temp;
+    }
+
+    /*添加球员*/
+    function addTeamPlayersList(teamId, count, type, gradeId) {
+        console.log(teamId + "," + type + "," + count)
+        Core.load("#addPlayersDetailOpenWindow", "/team/addTeamPlayersDetail/" + teamId + "/" + type + "/" + count + "/" + gradeId, function () {
+            $("#addPlayersDetailModal").modal("show");
+        }, 2);
+    }
+
+    function sexSwitch() {
+        Core.refreshTable("#addTeamPlayersTable");
+    }
+
+    /*查询角色参数*/
+    function queryRoleParams(params) {
+        var temp = {
+            teamId: teamIdChecked,
+            sex: $("#sex").val()
+        };
+        return temp;
+    }
+
+    /*处理不能选择数据*/
+    function handleDisableData(res) {
+        disablePlayersIds = res.otherHasIds;
+        return res.rows;
+    }
+
+
+    $(function () {
+        /*查询*/
+        $("#btn_query").click(function () {
+            Core.refreshTable("#table");
+        });
+        getClassList();
+    })
+
+    $(function () {
+        /*新增球队*/
+        $("#addTeamButton").click(function () {
+            Core.load("#teamOpenWindow", "/team/addTeamDetail", function () {
+                $("#addTeamModal").modal("show");
+            }, 2);
+        });
+
+        /*添加球员*/
+        $("#saveTeamPlayers").click(function () {
+            var checkedRows = Core.selectMutiData("#addTeamPlayersTable");
+            if (checkedRows) {
+                var length = checkedRows.length;
+                if (length > playersCount) {
+                    layer.msg("选择人数大于球队上限人数");
+                    return;
+                }
+                Core.mask("#saveTeamPlayers");
+                studentIdStr = "";
+                $.each(checkedRows, function (i, item) {
+                    studentIdStr += (item.studentId + ",");
+                })
+                studentIdStr = studentIdStr.substring(0, studentIdStr.length - 1);
+                console.log(studentIdStr);
+                Core.postAjax('/teamPlayers/addTeamPlayers', {
+                    teamId: teamIdChecked,
+                    studentIdStr: studentIdStr
+                }, function (data) {
+                    Core.unmask("#saveTeamPlayers");
+                    if (data.code == 100000003) {
+                        $("#addTeamPlayersModal").modal("hide");
+                        Core.refreshTable("#table");
+                    }
+                    layer.msg(data.msg);
+                })
+            }
+        })
+
+    })
+
+    function switchPeriod() {
+        getClassList();
+        Core.refreshTable("#table");
+    }
+    
+    function switchClass() {
+        Core.refreshTable("#table");
+    }
+    function searchName() {
+        Core.refreshTable("#table");
+    }
+
+    /*查询班级*/
+    function getClassList() {
+        var gradeId = $("#gradeId").val();
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getClassList",
+            data: {
+                gradeId: gradeId
+            },
+            success: function (datas) {
+                var teamsOptions;
+                document.getElementById("classId").options.length = 0;
+                var teamsOptions = "<option value=''>==选择班级==</option>";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions += "<option value='" + d.classId + "'>" + d.className + "</option>";
+                }
+                $("#classId").append(teamsOptions);
+            }
+        });
+    }
+
+</script>

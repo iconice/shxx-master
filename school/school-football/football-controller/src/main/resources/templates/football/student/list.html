@@ -1,0 +1,313 @@
+<!-- 头部 -->
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 首页</a></li>
+        <li><a href="#">学员管理</a></li>
+        <li class="active">学员信息</li>
+    </ol>
+</section>
+<!-- 查询部分 -->
+<section class="content">
+    <div class="jax-box">
+        <form id="formSearch" class="form-horizontal form-search">
+            <div class="form-group">
+                <div class="col-md-3 col-sm-6">
+                    <label class="col-sm-3 control-label">选择届<span style="color: red">*</span>:</label>
+                    <div class="col-sm-8">
+                        <select id="gradeId" name="gradeId" class="form-control" onchange="switchPeriod()">
+                            <option th:each="supplier : ${grades}" th:value="${supplier.gradeId}"
+                                    th:text="${supplier.gradeName}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label  class="control-label  col-sm-3" for="classId">班级 :</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="classId">
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <label class="control-label  col-sm-3" for="name">学生姓名:</label>
+                    <div class="col-xs-8">
+                        <input type="text" class="form-control" id="name">
+                    </div>
+                </div>
+                <div class="col-md-1 col-sm-3 " style="text-align:left;">
+                    <button type="button" id="btn_query" class="btn btn-info">查询</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="jax-box jax-box-table">
+        <div id="toolbar" class="btn-group">
+            <button id="btn_add" type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentModal">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+            </button>
+        </div>
+        <!--  数据列表 -->
+        <table id="table"></table>
+    </div>
+</section>
+
+<!-- x学生新增模态框 -->
+<div id="studentModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">新增学生</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="studentForm">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">届 <span style="color: red">*</span>:</label>
+                            <div class="col-sm-8">
+                                <select id="addGradeId" name="addGradeId" class="form-control" onchange="addUserSwitchPeriod()">
+                                    <option value=''>==选择届==</option>
+                                    <option th:each="supplier : ${grades}" th:value="${supplier.gradeId}"
+                                            th:text="${supplier.gradeName}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">班级名称 <span style="color: red">*</span>:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="addUserClassId" name="classId">
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">学生姓名 <span style="color: red">*</span>:</label>
+                            <div class="col-sm-8">
+                                <input name="name" class="form-control" minlength="2" require="必填项" placeholder="请填写姓名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">年龄<span style="color: red">*</span>:</label>
+                            <div class="col-sm-8">
+                                <input name="age" class="form-control" min="1" placeholder="年龄">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">性别<span style="color: red">*</span>:</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" minlength="1">
+                                    <option  value="">请选择</option>
+                                    <option value="0">男</option>
+                                    <option value="1">女</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">身高(单位：cm) <span style="color: red">*</span>:</label>
+                            <div class="col-sm-8">
+                                <input name="height" class="form-control" min="2"
+                                       placeholder="身高">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">体重(单位：kg) <span style="color: red">*</span>:</label>
+                            <div class="col-sm-8">
+                                <input name="weight" class="form-control" min="2"
+                                       placeholder="体重">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer">
+                        <div class="pull-right">
+                            <button type="button" id="saveStudent" class="btn btn-info">确定</button>
+                            <button type="button" data-dismiss="modal" class="btn btn-default">取消</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 学生详情模态框 -->
+<div id="studentDetailModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">学生信息</h4>
+            </div>
+            <div class="modal-body">
+                <div id="studentOpenWindow">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var loadRoleCount = 0;
+    var isAddUser = 0;
+    var columns = [
+        {checkbox: true},
+        {
+            field: 'className',
+            title: '班级名称',
+            align: "center"
+        }, {
+            field: 'name',
+            title: '学生姓名',
+            align: "center"
+        }, {
+            field: 'phone',
+            title: '联系电话',
+            align: "center"
+        },
+        {
+            field: 'sex',
+            title: '性别',
+            align: "center",
+            formatter:function(value,row, index){
+                return row.sex == '1' ? "女" : "男";
+            }
+        },
+        {
+            field: 'height',
+            title: '身高(单位：cm)',
+            align: "center"
+        },
+        {
+            field: 'weight(单位：kg)',
+            title: '体重',
+            align: "center"
+        },
+        {
+            field: 'operation',
+            title: '操作',
+            align: "center",
+            formatter: function (value, row, index) {
+                /*  更改onclick */
+                var edit = '<a class="table-btn table-btn-info" href="javascript:void(0)" onclick="editStudent(' + row.studentId + ',' + row.gradeId + ')">编辑</a>';
+                var del = '<a  class="table-btn table-btn-danger" href="javascript:void(0)" onclick="deleteStudent(' + row.studentId + ')">删除</a>';
+                return edit + del;
+            }
+        }];
+    var options = {
+        id: "#table",
+        url: '/student/queryStudentPageList',
+        columns: columns,
+        toolbar: '#toolbar',
+        showRefresh: true,
+        queryParams: queryParams
+    }
+
+    // 加载列表
+    Core.initTable(options);
+
+    /*查询用户参数*/
+    function queryParams(params) {
+        var temp = { //这里的键的名字和控制器的变量名必须一致，这边改动，控制器也需要改成一样的
+            limit: params.limit, //页面大小
+            offset: params.offset, //页码
+            gradeId: $("#gradeId").val(),
+            classId: $("#classId").val(),
+            name: $("#name").val(),
+            sex: $("#sex").val()
+        };
+        return temp;
+    }
+
+    /*编辑*/
+    function editStudent(studentId, gradeId) {
+        Core.load("#studentOpenWindow", "/student/edit?studentId=" + studentId + "&gradeId=" + gradeId, function () {
+            $("#studentDetailModal").modal("show");
+        }, 2);
+    }
+
+    /*删除*/
+    function deleteStudent(studentId) {
+        Core.confirm("确定删除该学员？", function () {
+            Core.postAjax("/student/deleteStudent", {"studentId": studentId}, function (data) {
+                if (data.code == 100000003) {
+                    Core.refreshTable("#table");
+                }
+                layer.msg(data.msg);
+            }, "get")
+        })
+    }
+
+    function addTeam(studentId){
+
+    }
+
+    $(function () {
+        /*查询*/
+        $("#btn_query").click(function () {
+            Core.refreshTable("#table");
+        });
+
+        /*新增*/
+        $("#btn_add").click(function () {
+            Core.clearError("#saveStudent");
+        });
+
+        getClassList();
+
+        /*保存学生*/
+        $("#saveStudent").click(function () {
+            if (doValidForm(studentForm)) {
+                Core.mask("#saveStudent");
+                Core.postAjax("/student/addStudent", $("#studentForm").serialize(), function (data) {
+                    Core.unmask("#saveStudent");
+                    if (data.code == 100000003) {
+                        Core.refreshTable("#table");
+                        $("#studentModal").modal("hide");
+                        $("#saveStudent")[0].reset();
+                    }
+                    layer.msg(data.msg);
+                })
+            };
+        });
+    });
+    function switchPeriod() {
+        isAddUser = 0;
+        getClassList();
+    }
+    
+    function addUserSwitchPeriod() {
+        isAddUser = 1;
+        getClassList();
+    }
+
+    /*查询班级*/
+    function getClassList() {
+        var gradeId = $("#gradeId").val();
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getClassList",
+            data: {
+                gradeId: gradeId
+            },
+            success: function (datas) {
+                var teamsOptions;
+                document.getElementById("classId").options.length = 0;
+                var teamsOptions = "<option value=''>==选择班级==</option>";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions += "<option value='" + d.classId + "'>" + d.className + "</option>";
+                }
+                if (isAddUser == 0) {
+                    $("#classId").append(teamsOptions);
+                }
+                if (isAddUser == 1) {
+                    $("#addUserClassId").append(teamsOptions);
+                }
+            }
+        });
+    }
+
+</script>

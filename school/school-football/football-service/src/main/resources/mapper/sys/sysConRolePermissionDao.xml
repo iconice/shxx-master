@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.sys.SysConRolePermissionDao">
+
+    <!--删除角色的权限-->
+    <delete id="deleteRolePermissionByRoleId">
+		DELETE
+		FROM
+			sys_con_role_permission
+		WHERE
+			role_id = #{roleId}
+	</delete>
+
+    <!--批量插入角色权限-->
+    <insert id="batchAddRolePermission" parameterType="java.util.List">
+        INSERT INTO `football`.`sys_con_role_permission` ( `id`, `role_id`, `permission_id`, `deletec`, `create_time`, `update_time`, `remark` )
+         VALUES
+        <foreach collection="list" item="cost" index="index" separator=",">
+            ( #{cost.id}, #{cost.roleId}, #{cost.permissionId}, 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL )
+        </foreach>
+    </insert>
+
+</mapper>

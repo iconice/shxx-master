@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sjht.school.football.dao.football.student.ClassDao">
+
+    <!-- 分页查询班级列表 -->
+    <select id="queryClassPageList" resultType="com.sjht.school.football.resp.football.student.QueryClassPageResp">
+        SELECT
+            c.id AS classId,
+            c.class_name AS className,
+            c.leader_name AS leaderName,
+            g.grade_name AS period,
+            c.leader_name AS leaderName
+        FROM
+          base_class c
+        INNER JOIN base_grade g ON c.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        where 1 = 1
+        <if test="params.gradeId != null">
+            AND c.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.className != null">
+            AND c.class_name LIKE CONCAT('%',#{params.className},'%')
+        </if>
+        <if test="params.teacher != null">
+            AND c.leader_name LIKE CONCAT('%',#{params.teacher},'%')
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+        ORDER BY c.update_time DESC
+    </select>
+
+    <!-- 分页查询班级列表数量 -->
+    <select id="queryClassPageCount" resultType="long">
+        SELECT
+            COUNT(*)
+        FROM
+          base_class c
+        INNER JOIN base_grade g ON c.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        where 1 = 1
+        <if test="params.gradeId != null">
+            AND c.grade_id = #{params.gradeId}
+        </if>
+        <if test="params.className != null">
+            AND c.class_name LIKE CONCAT('%',#{params.className},'%')
+        </if>
+        <if test="params.teacher != null">
+            AND c.leader_name LIKE CONCAT('%',#{params.teacher},'%')
+        </if>
+        <if test="params.userId != null">
+            AND gu.user_id = #{params.userId}
+        </if>
+    </select>
+
+    <select id="getClassInfo" resultType="com.sjht.school.football.resp.football.student.GetClassInfoResp">
+        SELECT
+            c.id,
+            c.class_name AS className,
+            c.leader_name AS leaderName,
+            g.grade_name AS gradeName
+        FROM
+            base_class c
+            INNER JOIN base_grade g ON c.grade_id = g.id
+        WHERE
+            c.id = #{classId}
+    </select>
+
+    <update id="updateClassByClassId" >
+        UPDATE `base_class`
+        SET
+            class_name = #{ew.className},
+            leader_name = #{ew.leaderName},
+            update_time = CURRENT_TIMESTAMP
+        WHERE
+            id = #{ew.classId}
+    </update>
+
+    <select id="getClassList" resultType="com.sjht.school.football.resp.football.student.GetClassListResp">
+        SELECT DISTINCT
+            c.id AS classId,
+            c.class_name AS className
+        FROM
+            base_class c
+        INNER JOIN base_grade g ON c.grade_id = g.id
+        INNER JOIN base_con_grade_user gu ON g.id = gu.grade_id
+        WHERE 1 = 1
+        <if test="params.gradeId != null and params.gradeId != ''">
+            AND gu.grade_id = #{params.gradeId}
+        </if>
+        ORDER BY c.class_name DESC
+    </select>
+
+    <select id="getClassSelectList" resultType="com.sjht.school.football.resp.football.student.GetClassListResp">
+        SELECT DISTINCT
+            c.id AS classId,
+            c.period,
+            c.class_name AS className,
+        CASE
+                WHEN ur.user_id IS NULL THEN
+                0 ELSE 1
+            END AS isSelect
+            FROM
+                base_class c
+            LEFT JOIN base_con_class_user ur ON c.id = ur.class_id
+            AND ur.user_id = #{userId}
+          where c.period = #{period}
+        ORDER BY c.period DESC
+    </select>
+
+    <!-- 得到届 -->
+    <select id="getPeriodList" resultType="String">
+        SELECT DISTINCT
+            c.period
+        FROM
+            base_class c
+        <if test="userId != null">
+            INNER JOIN base_con_class_user ur ON c.id = ur.class_id AND ur.user_id = #{userId}
+        </if>
+        LIMIT 6
+    </select>
+
+</mapper>

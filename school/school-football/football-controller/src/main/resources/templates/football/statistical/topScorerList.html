@@ -1,0 +1,153 @@
+<section class="content-header">
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 首页</a></li>
+        <li><a href="#">数据统计</a></li>
+        <li class="active">射手榜</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="jax-box">
+        <form id="formSearch" class="form-horizontal form-search">
+            <div class="form-group">
+                <div class="col-md-3 col-sm-6">
+                    <label class="col-sm-3 control-label">类型:</label>
+                    <div class="col-sm-8">
+                        <select id="category" name="category" class="form-control" onchange="switchCategory()">
+                            <option value="1">天天见赛</option>
+                            <option value="3">课堂赛</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <label class="col-sm-3 control-label">选择届:</label>
+                    <div class="col-sm-8">
+                        <select id="gradeId" name="gradeId" class="form-control" onchange="switchPeriod()">
+                            <option th:each="supplier : ${grades}" th:value="${supplier.gradeId}"
+                                    th:text="${supplier.gradeName}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 classId_class">
+                    <label class="control-label  col-sm-3" for="classId">班级 :</label>
+                    <div class="col-sm-8">
+                        <select class="form-control" id="classId" onchange="switchClass()">
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="jax-box jax-box-table">
+        <!--  数据列表 -->
+        <table id="table"></table>
+    </div>
+</section>
+
+<script>
+
+    var columns = [
+        {
+            field: 'top',
+            title: '排名',
+            align: "center",
+            formatter: function (value, row, index) {
+                return index + 1;
+            }
+        }, {
+            field: 'studentName',
+            title: '学生姓名',
+            align: "center"
+        }, {
+            field: 'score',
+            title: '进球数',
+            align: "center"
+        }, {
+            field: 'teamName',
+            title: '所在球队',
+            align: "center"
+        }, {
+            field: 'gradeName',
+            title: '届',
+            align: "center"
+        }, {
+            field: 'className',
+            title: '班级',
+            align: "center"
+        }];
+    var options = {
+        id: "#table",
+        url: '/statistical/event/getTopScorerList',
+        columns: columns,
+        toolbar: '#toolbar',
+        showRefresh: true,
+        queryParams: queryParams
+    }
+    // 加载列表
+    Core.initTable(options);
+
+    /*查询用户参数*/
+    function queryParams(params) {
+        var temp = { //这里的键的名字和控制器的变量名必须一致，这边改动，控制器也需要改成一样的
+            limit: params.limit, //页面大小
+            offset: params.offset, //页码
+            gradeId: $("#gradeId").val(),
+            classId: $("#classId").val(),
+            teamType: $("#category").val()
+        };
+        return temp;
+    }
+
+    $(function () {
+        getClassList();
+        switchCategory();
+    });
+
+    // 切换类型
+    function switchCategory() {
+        var category = $("#category").val();
+        if (category == 3) {
+            getClassList();
+            $(".classId_class").show();
+        } else {
+            document.getElementById("classId").options.length = 0;
+            $(".classId_class").hide();
+        }
+        Core.refreshTable("#table");
+    }
+
+    // 切换年级
+    function switchPeriod() {
+        getClassList();
+        Core.refreshTable("#table");
+    };
+
+    // 切换班级
+    function switchClass() {
+        Core.refreshTable("#table");
+    }
+
+    /*查询班级*/
+    function getClassList() {
+        var gradeId = $("#gradeId").val();
+        $.ajax({
+            type: 'GET',
+            dataType: "json",
+            url: "/team/getClassList",
+            data: {
+                gradeId: gradeId
+            },
+            success: function (datas) {
+                var teamsOptions;
+                document.getElementById("classId").options.length = 0;
+                var teamsOptions = "<option value=''>==选择班级==</option>";
+                for (var i = 0; i < datas.length; i++) {
+                    var d = datas[i];
+                    teamsOptions += "<option value='" + d.classId + "'>" + d.className + "</option>";
+                }
+                $("#classId").append(teamsOptions);
+            }
+        });
+    }
+</script>
